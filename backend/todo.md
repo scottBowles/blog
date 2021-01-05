@@ -35,5 +35,3 @@ timestamp - created & updated?
 author
 email
 post
-
-/* test */
