@@ -3,6 +3,8 @@ import express from 'express';
 import helmet from 'helmet';
 import bodyParser from 'body-parser';
 import createError from 'http-errors';
+import Joi from 'joi';
+import joiObjectid from 'joi-objectid';
 import indexRouter from './routes/index.js';
 import usersRouter from './routes/users.js';
 import postsRouter from './routes/posts.js';
@@ -10,6 +12,9 @@ import { models, validate } from './models/index.js';
 
 /* Set up mongoose connection */
 import './config/database.js';
+
+/* Add objectId to our Joi object for objectId validation */
+Joi.objectId = joiObjectid(Joi);
 
 dotenv.config();
 

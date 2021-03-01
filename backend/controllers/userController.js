@@ -1,3 +1,5 @@
+import { isValidObjectId } from '../models/utils';
+
 export async function usersGet(req, res, next) {
   const users = await req.context.models.User.find();
   return res.json(users);
@@ -17,12 +19,19 @@ export async function usersPost(req, res, next) {
 }
 
 export async function userGet(req, res, next) {
+  if (!isValidObjectId(req.params.userid)) {
+    return res.status(400).json('Invalid customer');
+  }
+
   const user = await req.context.models.User.findById(req.params.userid);
   return res.json(user);
 }
 
 export async function userPut(req, res, next) {
-  const { value, error } = req.context.validate.user(req.body);
+  const { value, error } = req.context.validate.user({
+    ...req.body,
+    user: req.params.userid,
+  });
   // handle errors
   const user = await req.context.models.User.findById(req.params.userid);
 
@@ -37,19 +46,30 @@ export async function userPut(req, res, next) {
 }
 
 export async function userDelete(req, res, next) {
+  if (!isValidObjectId(req.params.userid)) {
+    return res.status(400).json('Invalid customer');
+  }
+
   const user = await req.context.models.User.findById(req.params.userid);
   if (user) await user.remove();
   return res.json(user);
 }
 
 export async function userPostsGet(req, res, next) {
-  const { userid } = req.params;
-  const posts = await req.context.models.Post.find({ user: userid });
+  if (!isValidObjectId(req.params.userid)) {
+    return res.status(400).json('Invalid customer');
+  }
+
+  const posts = await req.context.models.Post.find({ user: req.params.userid });
   return res.json(posts);
 }
 
 export async function userPostsPost(req, res, next) {
-  const { value, error } = req.context.validate.post(req.body);
+  const { value, error } = req.context.validate.post({
+    ...req.body,
+    user: req.params.userid,
+  });
+
   // handle errors
   const { title, text, isPublished } = value;
   const post = await req.context.models.Post.create({

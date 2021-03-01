@@ -18,7 +18,7 @@ export function validateComment(comment) {
     text: Joi.string().min(1).max(255).required(),
     author: Joi.string().min(1).max(255).required(),
     email: Joi.string().email().max(255),
-    // post will come through params
+    post: Joi.objectId().required(),
   });
   return schema.validate(comment);
 }

@@ -18,7 +18,7 @@ export function validatePost(post) {
     title: Joi.string().min(1).max(255),
     text: Joi.string().min(1).max(99999),
     isPublished: Joi.boolean,
-    // user will come through params
+    user: Joi.objectId().required(),
   });
   return schema.validate(post);
 }
