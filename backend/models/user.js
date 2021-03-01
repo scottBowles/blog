@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const UserSchema = new mongoose.Schema({
   firstName: { type: String, required: true, minlength: 1, maxlength: 255 },
@@ -11,4 +11,6 @@ UserSchema.virtual('fullName').get(function () {
   return `${this.firstName} ${this.lastName}`;
 });
 
-module.exports = mongoose.model('User', UserSchema);
+const User = mongoose.model('User', UserSchema);
+
+export default User;

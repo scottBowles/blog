@@ -1,17 +1,21 @@
-const router = require('express').Router();
+import express from 'express';
 
-router.get('/', (req, res) => {});
-router.post('/', (req, res) => {});
+import * as userController from '../controllers/userController.js';
 
-router.get('/:userid', (req, res) => {});
-router.put('/:userid', (req, res) => {});
-router.delete('/:userid', (req, res) => {});
+const router = express.Router();
 
-router.get('/:userid/posts', (req, res) => {});
-router.post('/:userid/posts', (req, res) => {});
+router.get('/', userController.usersGet);
+router.post('/', userController.usersPost);
 
-router.get('/:userid/posts/:postid', (req, res) => {});
-router.put('/:userid/posts/:postid', (req, res) => {});
-router.delete('/:userid/posts/:postid', (req, res) => {});
+router.get('/:userid', userController.userGet);
+router.put('/:userid', userController.userPut);
+router.delete('/:userid', userController.userDelete);
 
-module.exports = router;
+router.get('/:userid/posts', userController.userPostsGet);
+router.post('/:userid/posts', userController.userPostsPost);
+
+router.get('/:userid/posts/:postid', userController.userPostGet);
+router.put('/:userid/posts/:postid', userController.userPostPut);
+router.delete('/:userid/posts/:postid', userController.userPostDelete);
+
+export default router;

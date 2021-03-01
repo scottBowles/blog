@@ -1,17 +1,20 @@
-const router = require('express').Router();
+import express from 'express';
+import * as postController from '../controllers/postController.js';
 
-router.get('/', (req, res) => {});
-router.post('/', (req, res) => {});
+const router = express.Router();
 
-router.get('/:postid', (req, res) => {});
-router.put('/:postid', (req, res) => {});
-router.delete('/:postid', (req, res) => {});
+router.get('/', postController.postsGet);
+router.post('/', postController.postsPost);
 
-router.get('/:postid/comments', (req, res) => {});
-router.post('/:postid/comments', (req, res) => {});
+router.get('/:postid', postController.postGet);
+router.put('/:postid', postController.postPut);
+router.delete('/:postid', postController.postDelete);
 
-router.get('/:postid/comments/:commentid', (req, res) => {});
-router.put('/:postid/comments/:commentid', (req, res) => {});
-router.delete('/:postid/comments/:commentid', (req, res) => {});
+router.get('/:postid/comments', postController.postCommentsGet);
+router.post('/:postid/comments', postController.postCommentsPost);
 
-module.exports = router;
+router.get('/:postid/comments/:commentid', postController.postCommentGet);
+router.put('/:postid/comments/:commentid', postController.postCommentPut);
+router.delete('/:postid/comments/:commentid', postController.postCommentDelete);
+
+export default router;

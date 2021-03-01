@@ -1,14 +1,18 @@
-require('dotenv').config();
-const express = require('express');
-const helmet = require('helmet');
-const bodyParser = require('body-parser');
-const createError = require('http-errors');
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
-const postsRouter = require('./routes/posts');
+// import models from './models/index.js';
+
+import dotenv from 'dotenv';
+import express from 'express';
+import helmet from 'helmet';
+import bodyParser from 'body-parser';
+import createError from 'http-errors';
+import indexRouter from './routes/index.js';
+import usersRouter from './routes/users.js';
+import postsRouter from './routes/posts.js';
 
 /* Set up mongoose connection */
-require('./config/database');
+import './config/database.js';
+
+dotenv.config();
 
 /* Create express app */
 const app = express();
