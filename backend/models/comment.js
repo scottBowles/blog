@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import Joi from 'joi';
 
 const CommentSchema = new mongoose.Schema(
   {
@@ -10,6 +11,14 @@ const CommentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Comment = mongoose.model('Comment', CommentSchema);
+export const Comment = mongoose.model('Comment', CommentSchema);
 
-export default Comment;
+export function validateComment(comment) {
+  const schema = Joi.object({
+    text: Joi.string().min(1).max(255).required(),
+    author: Joi.string().min(1).max(255).required(),
+    email: Joi.string().email().max(255),
+    // post will come through params
+  });
+  return schema.validate(comment);
+}

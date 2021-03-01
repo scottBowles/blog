@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import Joi from 'joi';
 
 const PostSchema = new mongoose.Schema(
   {
@@ -10,6 +11,16 @@ const PostSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Post = mongoose.model('Post', PostSchema);
+export const Post = mongoose.model('Post', PostSchema);
 
-export default Post;
+export function validatePost(post) {
+  const schema = Joi.object({
+    title: Joi.string().min(1).max(255),
+    text: Joi.string().min(1).max(99999),
+    isPublished: Joi.boolean,
+    // user will come through params
+  });
+  return schema.validate(post);
+}
+
+export default { Post, validatePost };

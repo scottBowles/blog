@@ -1,7 +1,15 @@
-import User from './user.js';
-import Post from './post.js';
-import Comment from './comment.js';
+import { User, validateUser } from './user.js';
+import { Post, validatePost } from './post.js';
+import { Comment, validateComment } from './comment.js';
 
-const models = { User, Post, Comment };
+export const models = {
+  User,
+  Post,
+  Comment,
+};
 
-export default models;
+export const validate = {
+  user: validateUser,
+  post: validatePost,
+  comment: validateComment,
+};

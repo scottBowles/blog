@@ -6,7 +6,7 @@ import createError from 'http-errors';
 import indexRouter from './routes/index.js';
 import usersRouter from './routes/users.js';
 import postsRouter from './routes/posts.js';
-import models from './models/index.js';
+import { models, validate } from './models/index.js';
 
 /* Set up mongoose connection */
 import './config/database.js';
@@ -23,7 +23,7 @@ app.use(bodyParser.json());
 
 /* Add a context object */
 app.use((req, res, next) => {
-  req.context = { models };
+  req.context = { models, validate };
   next();
 });
 

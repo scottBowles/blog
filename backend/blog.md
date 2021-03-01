@@ -1,3 +1,7 @@
+TODO
+Handle errors in routes
+Add validation to routes
+
 ROUTES
 
 /
