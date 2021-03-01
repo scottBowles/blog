@@ -1,39 +1,56 @@
-export function usersGet(req, res, next) {
-  return res.json({ msg: 'users' });
+export async function usersGet(req, res, next) {
+  const users = await req.context.models.User.find();
+  return res.json(users);
 }
 
-export function usersPost(req, res, next) {
-  return res.json({ msg: 'users_post' });
+export async function usersPost(req, res, next) {
+  const { firstName, lastName, email, password } = req.body;
+  const user = await req.context.models.User.create({
+    firstName,
+    lastName,
+    email,
+    password,
+  });
+  return res.json(user);
 }
 
-export function userGet(req, res, next) {
-  return res.json({ msg: 'user_get' });
+export async function userGet(req, res, next) {
+  const user = await req.context.models.User.findById(req.params.userid);
+  return res.json(user);
 }
 
-export function userPut(req, res, next) {
-  return res.json({ msg: 'user_put' });
+export async function userPut(req, res, next) {
+  const user = await req.context.models.User.findById(req.params.userid);
+
+  user.firstName = req.body.firstName;
+  user.lastName = req.body.lastName;
+  user.email = req.body.email;
+  user.password = req.body.password;
+
+  const updatedUser = await user.save();
+
+  return res.json(updatedUser);
 }
 
-export function userDelete(req, res, next) {
-  return res.json({ msg: 'user_delete' });
+export async function userDelete(req, res, next) {
+  const user = await req.context.models.User.findById(req.params.userid);
+  if (user) await user.remove();
+  return res.json(user);
 }
 
-export function userPostsGet(req, res, next) {
-  return res.json({ msg: 'user_posts_get' });
+export async function userPostsGet(req, res, next) {
+  const { userid } = req.params;
+  const posts = await req.context.models.Post.find({ user: userid });
+  return res.json(posts);
 }
 
-export function userPostsPost(req, res, next) {
-  return res.json({ msg: 'user_posts_post' });
-}
-
-export function userPostGet(req, res, next) {
-  return res.json({ msg: 'user_post_get' });
-}
-
-export function userPostPut(req, res, next) {
-  return res.json({ msg: 'user_post_put' });
-}
-
-export function userPostDelete(req, res, next) {
-  return res.json({ msg: 'user_post_delete' });
+export async function userPostsPost(req, res, next) {
+  const { title, text, isPublished } = req.body;
+  const post = await req.context.models.Post.create({
+    title,
+    text,
+    isPublished,
+    user: req.params.userid,
+  });
+  return res.json(post);
 }

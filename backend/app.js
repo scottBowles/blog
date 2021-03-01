@@ -1,5 +1,3 @@
-// import models from './models/index.js';
-
 import dotenv from 'dotenv';
 import express from 'express';
 import helmet from 'helmet';
@@ -8,6 +6,7 @@ import createError from 'http-errors';
 import indexRouter from './routes/index.js';
 import usersRouter from './routes/users.js';
 import postsRouter from './routes/posts.js';
+import models from './models/index.js';
 
 /* Set up mongoose connection */
 import './config/database.js';
@@ -21,6 +20,12 @@ const app = express();
 app.use(helmet());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+/* Add a context object */
+app.use((req, res, next) => {
+  req.context = { models };
+  next();
+});
 
 /* Direct routes */
 app.use('/', indexRouter);

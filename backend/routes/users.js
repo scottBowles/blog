@@ -14,8 +14,6 @@ router.delete('/:userid', userController.userDelete);
 router.get('/:userid/posts', userController.userPostsGet);
 router.post('/:userid/posts', userController.userPostsPost);
 
-router.get('/:userid/posts/:postid', userController.userPostGet);
-router.put('/:userid/posts/:postid', userController.userPostPut);
-router.delete('/:userid/posts/:postid', userController.userPostDelete);
+// For individual posts, use their `/post/:postid` uri
 
 export default router;

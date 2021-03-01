@@ -4,7 +4,7 @@ import * as postController from '../controllers/postController.js';
 const router = express.Router();
 
 router.get('/', postController.postsGet);
-router.post('/', postController.postsPost);
+// No POST route because any post requires a user. POST to `users/:userid/posts` instead.
 
 router.get('/:postid', postController.postGet);
 router.put('/:postid', postController.postPut);

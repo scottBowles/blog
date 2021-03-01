@@ -1,39 +1,65 @@
-export function postsGet(req, res, next) {
-  return res.json({ msg: 'posts_get' });
+export async function postsGet(req, res, next) {
+  const posts = await req.context.models.Post.find();
+  return res.json(posts);
 }
 
-export function postsPost(req, res, next) {
-  return res.json({ msg: 'posts_post' });
+export async function postGet(req, res, next) {
+  const post = await req.context.models.Post.findById(req.params.postid);
+  return res.json(post);
 }
 
-export function postGet(req, res, next) {
-  return res.json({ msg: 'post_get' });
+export async function postPut(req, res, next) {
+  const post = await req.context.models.Post.findById(req.params.postid);
+  post.title = req.body.title;
+  post.text = req.body.text;
+  post.isPublished = req.body.isPublished;
+  const updatedPost = await post.save();
+  return res.json(updatedPost);
 }
 
-export function postPut(req, res, next) {
-  return res.json({ msg: 'post_put' });
+export async function postDelete(req, res, next) {
+  const post = await req.context.models.Post.findById(req.params.postid);
+  if (post) await post.remove();
+  return res.json(post);
 }
 
-export function postDelete(req, res, next) {
-  return res.json({ msg: 'post_delete' });
+export async function postCommentsGet(req, res, next) {
+  const { postid } = req.params;
+  const comments = await req.context.models.Comment.find({ post: postid });
+  return res.json(comments);
 }
 
-export function postCommentsGet(req, res, next) {
-  return res.json({ msg: 'post_comments_get' });
+export async function postCommentsPost(req, res, next) {
+  const { text, author, email } = req.body;
+  const comment = await req.context.models.Comment.create({
+    text,
+    author,
+    email,
+    post: req.params.postid,
+  });
+  return res.json(comment);
 }
 
-export function postCommentsPost(req, res, next) {
-  return res.json({ msg: 'post_comments_post' });
+export async function postCommentGet(req, res, next) {
+  const { commentid } = req.params;
+  const comment = await req.context.models.Comment.findById(commentid);
+  return res.json(comment);
 }
 
-export function postCommentGet(req, res, next) {
-  return res.json({ msg: 'post_comment_get' });
+export async function postCommentPut(req, res, next) {
+  const { text, author, email } = req.body;
+  const { commentid } = req.params;
+  const comment = await req.context.models.Comment.findById(commentid);
+  comment.text = text;
+  comment.author = author;
+  comment.email = email;
+  const updatedComment = await comment.save();
+  return res.json(updatedComment);
 }
 
-export function postCommentPut(req, res, next) {
-  return res.json({ msg: 'post_comment_put' });
-}
-
-export function postCommentDelete(req, res, next) {
-  return res.json({ msg: 'post_comment_delete' });
+export async function postCommentDelete(req, res, next) {
+  const { commentid } = req.params;
+  const comment = await req.context.models.Comment.findById(commentid);
+  if (comment) comment.remove();
+  return res.json(comment);
 }
