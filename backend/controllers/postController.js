@@ -9,10 +9,12 @@ export async function postGet(req, res, next) {
 }
 
 export async function postPut(req, res, next) {
+  const { value, error } = req.context.validate.post(req.body);
+  // handle error && use value
   const post = await req.context.models.Post.findById(req.params.postid);
-  post.title = req.body.title;
-  post.text = req.body.text;
-  post.isPublished = req.body.isPublished;
+  post.title = value.title;
+  post.text = value.text;
+  post.isPublished = value.isPublished;
   const updatedPost = await post.save();
   return res.json(updatedPost);
 }
@@ -30,7 +32,9 @@ export async function postCommentsGet(req, res, next) {
 }
 
 export async function postCommentsPost(req, res, next) {
-  const { text, author, email } = req.body;
+  const { value, error } = req.context.validate.comment(req.body);
+  // handle errors
+  const { text, author, email } = value;
   const comment = await req.context.models.Comment.create({
     text,
     author,
@@ -47,7 +51,9 @@ export async function postCommentGet(req, res, next) {
 }
 
 export async function postCommentPut(req, res, next) {
-  const { text, author, email } = req.body;
+  const { value, error } = req.context.validate.comment(req.body);
+  // handle errors
+  const { text, author, email } = value;
   const { commentid } = req.params;
   const comment = await req.context.models.Comment.findById(commentid);
   comment.text = text;

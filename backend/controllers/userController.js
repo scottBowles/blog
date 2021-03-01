@@ -4,7 +4,9 @@ export async function usersGet(req, res, next) {
 }
 
 export async function usersPost(req, res, next) {
-  const { firstName, lastName, email, password } = req.body;
+  const { value, error } = req.context.validate.user(req.body);
+  // handle errors
+  const { firstName, lastName, email, password } = value;
   const user = await req.context.models.User.create({
     firstName,
     lastName,
@@ -20,12 +22,14 @@ export async function userGet(req, res, next) {
 }
 
 export async function userPut(req, res, next) {
+  const { value, error } = req.context.validate.user(req.body);
+  // handle errors
   const user = await req.context.models.User.findById(req.params.userid);
 
-  user.firstName = req.body.firstName;
-  user.lastName = req.body.lastName;
-  user.email = req.body.email;
-  user.password = req.body.password;
+  user.firstName = value.firstName;
+  user.lastName = value.lastName;
+  user.email = value.email;
+  user.password = value.password;
 
   const updatedUser = await user.save();
 
@@ -45,7 +49,9 @@ export async function userPostsGet(req, res, next) {
 }
 
 export async function userPostsPost(req, res, next) {
-  const { title, text, isPublished } = req.body;
+  const { value, error } = req.context.validate.post(req.body);
+  // handle errors
+  const { title, text, isPublished } = value;
   const post = await req.context.models.Post.create({
     title,
     text,
