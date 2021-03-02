@@ -23,23 +23,26 @@ export async function userGet(req, res, next) {
   }
 
   const user = await req.context.models.User.findById(req.params.userid);
+  if (!user) return res.status(404).json('User not found');
+
   return res.json(user);
 }
 
 export async function userPut(req, res, next) {
-  const { value, error } = req.context.validate.user({
+  const { error } = req.context.validate.user({
     ...req.body,
     user: req.params.userid,
   });
 
   if (error) return res.status(400).send(error.details[0].message);
 
-  const user = await req.context.models.User.findById(value.userid);
+  const user = await req.context.models.User.findById(req.body.userid);
+  if (!user) return res.status(404).json('User not found');
 
-  user.firstName = value.firstName;
-  user.lastName = value.lastName;
-  user.email = value.email;
-  user.password = value.password;
+  user.firstName = req.body.firstName;
+  user.lastName = req.body.lastName;
+  user.email = req.body.email;
+  user.password = req.body.password;
 
   const updatedUser = await user.save();
 

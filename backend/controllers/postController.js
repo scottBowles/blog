@@ -19,18 +19,19 @@ export async function postGet(req, res, next) {
 
 export async function postPut(req, res, next) {
   const { postid } = req.params;
-  const { value, error } = req.context.validate.post({
+  const { error } = req.context.validate.post({
     ...req.body,
     post: postid,
   });
-
   if (error) return res.status(400).send(error.details[0].message);
 
-  const { title, text, isPublished, post } = value;
-  const foundPost = await req.context.models.Post.findById(post);
-  foundPost.title = title;
-  foundPost.text = text;
-  foundPost.isPublished = isPublished;
+  const post = await req.context.models.Post.findById(postid);
+  if (!post) return res.status(404).send('Post not found');
+
+  post.title = req.body.title;
+  post.text = req.body.text;
+  post.isPublished = req.body.isPublished;
+
   const updatedPost = await post.save();
   return res.json(updatedPost);
 }
@@ -63,8 +64,10 @@ export async function postCommentsPost(req, res, next) {
     ...req.body,
     post: req.params.postid,
   });
+  if (error) return res.status(400).json(error.details[0].message);
 
-  if (error) return res.status(400).send(error.details[0].message);
+  const post = await req.context.models.Post.findById(req.params.postid);
+  if (!post) return res.status(404).json('Post not found');
 
   const comment = await req.context.models.Comment.create(
     _.pick(value, ['text', 'author', 'email', 'post'])
@@ -80,27 +83,30 @@ export async function postCommentGet(req, res, next) {
   }
 
   const comment = await req.context.models.Comment.findById(commentid);
+  if (!comment) return res.status(404).json('Comment not found');
   return res.json(comment);
 }
 
 export async function postCommentPut(req, res, next) {
   const { postid, commentid } = req.params;
 
-  const { value, error } = req.context.validate.comment({
+  const { error } = req.context.validate.comment({
     ...req.body,
     post: postid,
   });
 
   if (!isValidObjectId(commentid))
     return res.status(400).json('Invalid commentid');
-
   if (error) return res.status(400).send(error.details[0].message);
 
-  const { text, author, email } = value;
+  const post = await req.context.models.Post.findById(postid);
+  if (!post) return res.status(404).json('Post not found');
   const comment = await req.context.models.Comment.findById(commentid);
-  comment.text = text;
-  comment.author = author;
-  comment.email = email;
+  if (!comment) return res.status(404).json('Comment not found');
+
+  comment.text = req.body.text;
+  comment.author = req.body.author;
+  comment.email = req.body.email;
   const updatedComment = await comment.save();
   return res.json(updatedComment);
 }
