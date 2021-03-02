@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { isValidObjectId } from '../models/utils.js';
 
 export async function postsGet(req, res, next) {
@@ -9,7 +10,7 @@ export async function postGet(req, res, next) {
   const { postid } = req.params;
 
   if (!isValidObjectId(postid)) {
-    return res.status(400).json('Invalid customer');
+    return res.status(400).json('Invalid postid');
   }
 
   const post = await req.context.models.Post.findById(postid);
@@ -22,11 +23,14 @@ export async function postPut(req, res, next) {
     ...req.body,
     post: postid,
   });
-  // handle error && use value
-  const post = await req.context.models.Post.findById(postid);
-  post.title = value.title;
-  post.text = value.text;
-  post.isPublished = value.isPublished;
+
+  if (error) return res.status(400).send(error.details[0].message);
+
+  const { title, text, isPublished, post } = value;
+  const foundPost = await req.context.models.Post.findById(post);
+  foundPost.title = title;
+  foundPost.text = text;
+  foundPost.isPublished = isPublished;
   const updatedPost = await post.save();
   return res.json(updatedPost);
 }
@@ -35,7 +39,7 @@ export async function postDelete(req, res, next) {
   const { postid } = req.params;
 
   if (!isValidObjectId(postid)) {
-    return res.status(400).json('Invalid customer');
+    return res.status(400).json('Invalid postid');
   }
 
   const post = await req.context.models.Post.findById(postid);
@@ -47,7 +51,7 @@ export async function postCommentsGet(req, res, next) {
   const { postid } = req.params;
 
   if (!isValidObjectId(postid)) {
-    return res.status(400).json('Invalid customer');
+    return res.status(400).json('Invalid postid');
   }
 
   const comments = await req.context.models.Comment.find({ post: postid });
@@ -59,14 +63,12 @@ export async function postCommentsPost(req, res, next) {
     ...req.body,
     post: req.params.postid,
   });
-  // handle errors
-  const { text, author, email } = value;
-  const comment = await req.context.models.Comment.create({
-    text,
-    author,
-    email,
-    post: req.params.postid,
-  });
+
+  if (error) return res.status(400).send(error.details[0].message);
+
+  const comment = await req.context.models.Comment.create(
+    _.pick(value, ['text', 'author', 'email', 'post'])
+  );
   return res.json(comment);
 }
 
@@ -74,7 +76,7 @@ export async function postCommentGet(req, res, next) {
   const { commentid } = req.params;
 
   if (!isValidObjectId(commentid)) {
-    return res.status(400).json('Invalid customer');
+    return res.status(400).json('Invalid commentid');
   }
 
   const comment = await req.context.models.Comment.findById(commentid);
@@ -82,13 +84,18 @@ export async function postCommentGet(req, res, next) {
 }
 
 export async function postCommentPut(req, res, next) {
-  const { commentid } = req.params;
+  const { postid, commentid } = req.params;
 
   const { value, error } = req.context.validate.comment({
     ...req.body,
-    commentid,
+    post: postid,
   });
-  // handle errors
+
+  if (!isValidObjectId(commentid))
+    return res.status(400).json('Invalid commentid');
+
+  if (error) return res.status(400).send(error.details[0].message);
+
   const { text, author, email } = value;
   const comment = await req.context.models.Comment.findById(commentid);
   comment.text = text;
@@ -102,7 +109,7 @@ export async function postCommentDelete(req, res, next) {
   const { commentid } = req.params;
 
   if (!isValidObjectId(commentid)) {
-    return res.status(400).json('Invalid customer');
+    return res.status(400).json('Invalid commentid');
   }
 
   const comment = await req.context.models.Comment.findById(commentid);
