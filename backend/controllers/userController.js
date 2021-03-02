@@ -1,4 +1,4 @@
-import { isValidObjectId } from '../models/utils';
+import { isValidObjectId } from '../models/utils.js';
 
 export async function usersGet(req, res, next) {
   const users = await req.context.models.User.find();

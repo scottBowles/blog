@@ -1,4 +1,4 @@
-import { isValidObjectId } from '../models/utils';
+import { isValidObjectId } from '../models/utils.js';
 
 export async function postsGet(req, res, next) {
   const posts = await req.context.models.Post.find();
