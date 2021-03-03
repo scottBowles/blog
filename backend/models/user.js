@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
 import Joi from 'joi';
 
 const UserSchema = new mongoose.Schema(
@@ -10,6 +11,10 @@ const UserSchema = new mongoose.Schema(
   },
   { toJSON: { virtuals: true } }
 );
+
+UserSchema.methods.generateAuthToken = function () {
+  return jwt.sign({ _id: this._id }, process.env.JWT_PRIVATE_KEY);
+}
 
 UserSchema.virtual('fullName').get(function () {
   return `${this.firstName} ${this.lastName}`;

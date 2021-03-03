@@ -27,9 +27,11 @@ export async function usersPost(req, res, next) {
     password: hashed,
   });
 
-  return res.json(
-    _.pick(user, ['_id', 'firstName', 'lastName', 'email', 'fullName'])
-  );
+  const token = user.generateAuthToken();
+
+  return res
+    .header('x-auth-token', token)
+    .json(_.pick(user, ['_id', 'firstName', 'lastName', 'email', 'fullName']));
 }
 
 export async function userGet(req, res, next) {
