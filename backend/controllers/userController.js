@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import bcrypt from 'bcrypt';
 import { isValidObjectId } from '../models/utils.js';
 
 export async function usersGet(req, res, next) {
@@ -13,13 +14,22 @@ export async function usersPost(req, res, next) {
   const existingUser = await req.context.models.User.findOne({
     email: req.body.email,
   });
-  console.log({ existingUser, email: req.body.email });
   if (existingUser) return res.status(400).json('User already registered');
 
-  const user = await req.context.models.User.create(
-    _.pick(req.body, ['firstName', 'lastName', 'email', 'password'])
+  // Hash the password before storing it
+  const salt = await bcrypt.genSalt(10);
+  const hashed = await bcrypt.hash(req.body.password, salt);
+
+  const user = await req.context.models.User.create({
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    email: req.body.email,
+    password: hashed,
+  });
+
+  return res.json(
+    _.pick(user, ['_id', 'firstName', 'lastName', 'email', 'fullName'])
   );
-  return res.json(_.pick(user, ['firstName', 'lastName', 'email', 'fullName']));
 }
 
 export async function userGet(req, res, next) {
