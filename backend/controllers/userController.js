@@ -7,14 +7,19 @@ export async function usersGet(req, res, next) {
 }
 
 export async function usersPost(req, res, next) {
-  const { value, error } = req.context.validate.user(req.body);
-
+  const { error } = req.context.validate.user(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
+  const existingUser = await req.context.models.User.findOne({
+    email: req.body.email,
+  });
+  console.log({ existingUser, email: req.body.email });
+  if (existingUser) return res.status(400).json('User already registered');
+
   const user = await req.context.models.User.create(
-    _.pick(value, ['firstName', 'lastName', 'email', 'password'])
+    _.pick(req.body, ['firstName', 'lastName', 'email', 'password'])
   );
-  return res.json(user);
+  return res.json(_.pick(user, ['firstName', 'lastName', 'email', 'fullName']));
 }
 
 export async function userGet(req, res, next) {
