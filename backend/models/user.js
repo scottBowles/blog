@@ -1,12 +1,15 @@
 import mongoose from 'mongoose';
 import Joi from 'joi';
 
-const UserSchema = new mongoose.Schema({
-  firstName: { type: String, required: true, minlength: 1, maxlength: 255 },
-  lastName: { type: String, required: true, minlength: 1, maxlength: 255 },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true, minlength: 8, maxlength: 255 },
-});
+const UserSchema = new mongoose.Schema(
+  {
+    firstName: { type: String, required: true, minlength: 1, maxlength: 255 },
+    lastName: { type: String, required: true, minlength: 1, maxlength: 255 },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true, minlength: 8, maxlength: 1024 },
+  },
+  { toJSON: { virtuals: true } }
+);
 
 UserSchema.virtual('fullName').get(function () {
   return `${this.firstName} ${this.lastName}`;
