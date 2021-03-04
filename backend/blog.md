@@ -1,6 +1,6 @@
 TODO
-Handle errors in routes
-Add validation to routes
+Manage authorizations with unpublished posts
+use a /me route to better manage logged in user
 
 ROUTES
 

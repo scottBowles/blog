@@ -1,3 +1,4 @@
+import { JsonWebTokenError } from 'jsonwebtoken';
 import _ from 'lodash';
 import { isValidObjectId } from '../models/utils.js';
 
@@ -42,10 +43,10 @@ export async function postPut(req, res, next) {
     return res.status(400).json('Invalid postid');
   }
 
-  /** Validate incoming data */
+  /** Validate incoming data. If user isn't provided, assume logged in user */
   const { error } = req.context.validate.post({
     ...req.body,
-    user: req.user._id,
+    user: req.body.user || req.user._id,
   });
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -53,9 +54,8 @@ export async function postPut(req, res, next) {
   const post = await req.context.models.Post.findById(req.params.postid);
   if (!post) return res.status(404).send('Post not found');
 
-  console.log({ _id: req.user._id, user: post.user });
-  /** Ensure post belongs to the logged-in user */
-  if (req.user._id !== post.user.toString())
+  /** Ensure post belongs to the logged-in user or user is admin */
+  if (req.user._id !== post.user.toString() && !req.user.isAdmin)
     return res.status(403).json(`Forbidden: Cannot update another user's post`);
 
   /** Update post */
@@ -75,9 +75,11 @@ export async function postDelete(req, res, next) {
 
   /** Get post from db */
   const post = await req.context.models.Post.findById(req.params.postid);
+  if (!post) return res.status(404).json('Post not found');
 
-  /** Ensure post belongs to the logged-in user */
-  if (post && post.user.toString() !== req.user._id)
+  /** Ensure post belongs to the logged-in user or user is admin */
+  const isUsersPost = post.user.toString() === req.user._id;
+  if (!isUsersPost && !req.user.isAdmin)
     return res.status(403).json(`Forbidden: Cannot remove another user's post`);
 
   /** Remove post */
@@ -133,39 +135,32 @@ export async function postCommentGet(req, res, next) {
  * If we do keep this route, we'll want to verify comment belongs to post if
  * we want to verify post belongs to user.
  */
-// export async function postCommentPut(req, res, next) {
-//   /** Ensure req.params.commentid is a valid objectid */
-//   if (!isValidObjectId(req.params.commentid))
-//     return res.status(400).json('Invalid commentid');
+export async function postCommentPut(req, res, next) {
+  /** Ensure req.params.commentid is a valid objectid */
+  if (!isValidObjectId(req.params.commentid))
+    return res.status(400).json('Invalid commentid');
 
-//   /** Validate incoming data */
-//   const { error } = req.context.validate.comment({
-//     ...req.body,
-//     post: req.params.postid,
-//   });
-//   if (error) return res.status(400).send(error.details[0].message);
+  /** Validate incoming data */
+  const { error } = req.context.validate.comment({
+    ...req.body,
+    post: req.params.postid,
+  });
+  if (error) return res.status(400).send(error.details[0].message);
 
-//   /** Get post from db */
-//   const post = await req.context.models.Post.findById(req.params.postid);
-//   if (!post) return res.status(404).json('Post not found');
+  /** Get comment from db */
+  const comment = await req.context.models.Comment.findById(
+    req.params.commentid
+  );
+  if (!comment) return res.status(404).json('Comment not found');
 
-//   /** Only allow post owner to update comments */
-//   if (post.user.toString() !== req.user._id)
-//     return res
-//       .status(403)
-//       .json(`Forbidden: Cannot update comments on another user's post`);
+  /** Update comment */
+  comment.text = req.body.text;
+  comment.author = req.body.author;
+  comment.email = req.body.email;
+  const updatedComment = await comment.save();
 
-//   const comment = await req.context.models.Comment.findById(
-//     req.params.commentid
-//   );
-//   if (!comment) return res.status(404).json('Comment not found');
-
-//   comment.text = req.body.text;
-//   comment.author = req.body.author;
-//   comment.email = req.body.email;
-//   const updatedComment = await comment.save();
-//   return res.json(updatedComment);
-// }
+  return res.json(updatedComment);
+}
 
 export async function postCommentDelete(req, res, next) {
   /** Ensure req.params.commentid && req.params.postid are valid objectids */
@@ -180,11 +175,10 @@ export async function postCommentDelete(req, res, next) {
   const post = await req.context.models.Post.findById(req.params.postid);
   if (!post) return res.status(404).json('Post not found');
 
-  /** Ensure post belongs to logged in user */
-  if (post.user.toString() !== req.user._id)
-    return res
-      .status(403)
-      .json(`Forbidden: Users can only delete comments on their own posts.`);
+  /** Ensure post belongs to logged in user or user is admin */
+  const isUsersPost = post.user.toString() === req.user._id;
+  if (!isUsersPost && !req.user.isAdmin)
+    return res.status(403).json(`Forbidden: Cannot remove comment.`);
 
   /** Get comment from db */
   const comment = await req.context.models.Comment.findById(

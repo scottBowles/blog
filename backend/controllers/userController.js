@@ -47,10 +47,11 @@ export async function userGet(req, res, next) {
 
 export async function userPut(req, res, next) {
   /**
-   * Only let logged in user change their own data
+   * Only let logged in user change their own data if not an admin
    * This also ensures req.params.userid is a valid objectid
    */
-  if (req.user._id !== req.params.userid)
+  const isLoggedInUser = req.user._id === req.params.userid;
+  if (!isLoggedInUser && !req.user.isAdmin)
     return res.status(403).json(`Forbidden: Cannot update another user's data`);
 
   /** Validate req.body */
@@ -87,10 +88,11 @@ export async function userPut(req, res, next) {
 
 export async function userDelete(req, res, next) {
   /**
-   * Only let logged in user delete their own account
+   * Only let logged in user delete their own account if not an admin
    * This also ensures req.params.userid is a valid objectid
    */
-  if (req.user._id !== req.params.userid)
+  const isLoggedInUser = req.user._id === req.params.userid;
+  if (!isLoggedInUser && !req.user.isAdmin)
     return res.status(403).json(`Forbidden: Cannot delete another user's data`);
 
   /** Get user from db and remove */
