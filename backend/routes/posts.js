@@ -1,10 +1,11 @@
 import express from 'express';
+import auth from '../middleware/auth.js';
 import * as postController from '../controllers/postController.js';
 
 const router = express.Router();
 
 router.get('/', postController.postsGet);
-// No POST route because any post requires a user. POST to `users/:userid/posts` instead.
+router.post('/', auth, postController.postsPost);
 
 router.get('/:postid', postController.postGet);
 router.put('/:postid', postController.postPut);

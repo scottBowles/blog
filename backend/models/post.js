@@ -17,7 +17,7 @@ export function validatePost(post) {
   const schema = Joi.object({
     title: Joi.string().min(1).max(255),
     text: Joi.string().min(1).max(99999),
-    isPublished: Joi.boolean,
+    isPublished: Joi.boolean(),
     user: Joi.objectId().required(),
   });
   return schema.validate(post);

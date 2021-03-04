@@ -6,6 +6,25 @@ export async function postsGet(req, res, next) {
   return res.json(posts);
 }
 
+export async function postsPost(req, res, next) {
+  /**
+   * Validate incoming data.
+   * Use logged in user. Users can only post to their own accounts.
+   */
+  const { value, error } = req.context.validate.post({
+    ...req.body,
+    user: req.user._id,
+  });
+  if (error) return res.status(400).send(error.details[0].message);
+
+  /** Create post */
+  const post = await req.context.models.Post.create(
+    _.pick(value, ['title', 'text', 'isPublished', 'user'])
+  );
+
+  return res.json(post);
+}
+
 export async function postGet(req, res, next) {
   const { postid } = req.params;
 

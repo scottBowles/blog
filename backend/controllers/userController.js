@@ -46,32 +46,57 @@ export async function userGet(req, res, next) {
 }
 
 export async function userPut(req, res, next) {
-  const { error } = req.context.validate.user({
-    ...req.body,
-    user: req.params.userid,
+  /**
+   * Only let logged in user change their own data
+   * This also ensures req.params.userid is a valid objectid
+   */
+  if (req.user._id !== req.params.userid)
+    return res.status(403).json(`Forbidden: Cannot update another user's data`);
+
+  /** Validate req.body */
+  const { error } = req.context.validate.user(req.body);
+  if (error) return res.status(400).json(error.details[0].message);
+
+  /** Ensure email is still unique */
+  const userWithGivenEmail = await req.context.models.User.findOne({
+    email: req.body.email,
   });
+  if (
+    userWithGivenEmail &&
+    userWithGivenEmail._id.toString() !== req.params.userid
+  )
+    return res.status(400).json('Email already in use');
 
-  if (error) return res.status(400).send(error.details[0].message);
-
-  const user = await req.context.models.User.findById(req.body.userid);
+  /** Get user from db */
+  const user = await req.context.models.User.findById(req.params.userid);
   if (!user) return res.status(404).json('User not found');
 
+  /** Salt and hash password */
+  const salt = await bcrypt.genSalt(10);
+  const hashed = await bcrypt.hash(req.body.password, salt);
+
+  /** Update user and save */
   user.firstName = req.body.firstName;
   user.lastName = req.body.lastName;
   user.email = req.body.email;
-  user.password = req.body.password;
-
+  user.password = hashed;
   const updatedUser = await user.save();
 
   return res.json(updatedUser);
 }
 
 export async function userDelete(req, res, next) {
-  if (!isValidObjectId(req.params.userid))
-    return res.status(400).json('Invalid userid');
+  /**
+   * Only let logged in user delete their own account
+   * This also ensures req.params.userid is a valid objectid
+   */
+  if (req.user._id !== req.params.userid)
+    return res.status(403).json(`Forbidden: Cannot delete another user's data`);
 
+  /** Get user from db and remove */
   const user = await req.context.models.User.findById(req.params.userid);
   if (user) await user.remove();
+
   return res.json(user);
 }
 
@@ -82,18 +107,4 @@ export async function userPostsGet(req, res, next) {
 
   const posts = await req.context.models.Post.find({ user: req.params.userid });
   return res.json(posts);
-}
-
-export async function userPostsPost(req, res, next) {
-  const { value, error } = req.context.validate.post({
-    ...req.body,
-    user: req.params.userid,
-  });
-
-  if (error) return res.status(400).send(error.details[0].message);
-
-  const post = await req.context.models.Post.create(
-    _.pick(value, ['title', 'text', 'isPublished', 'user'])
-  );
-  return res.json(post);
 }
