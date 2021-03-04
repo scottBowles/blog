@@ -6,7 +6,6 @@ import createError from 'http-errors';
 import indexRouter from '../routes/index.js';
 import usersRouter from '../routes/users.js';
 import postsRouter from '../routes/posts.js';
-import loginRouter from '../routes/login.js';
 import errorHandler from '../middleware/error.js';
 
 export default function (app) {
@@ -19,7 +18,6 @@ export default function (app) {
   app.use('/', indexRouter);
   app.use('/users', usersRouter);
   app.use('/posts', postsRouter);
-  app.use('/login', loginRouter);
 
   /* Catch 404s and forward to error handler */
   app.use((req, res, next) => next(createError(404)));
