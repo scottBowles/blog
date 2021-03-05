@@ -1,4 +1,3 @@
-import { JsonWebTokenError } from 'jsonwebtoken';
 import _ from 'lodash';
 import { isValidObjectId } from '../models/utils.js';
 
