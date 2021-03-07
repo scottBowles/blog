@@ -41,26 +41,17 @@ export async function userGet(req, res, next) {
 }
 
 export async function userPut(req, res, next) {
-  /**
-   * Only let logged in user change their own data if not an admin
-   */
-  const isLoggedInUser = req.user._id === req.params.userid;
-  if (!isLoggedInUser && !req.user.isAdmin)
-    return res.status(403).json(`Forbidden: Cannot update another user's data`);
-
   /** Validate req.body */
   const { error } = req.context.validate.user(req.body);
   if (error) return res.status(400).json(error.details[0].message);
 
   /** Ensure email is still unique */
+  /// /////// NEED TO TEST /////// ///
   const userWithGivenEmail = await req.context.models.User.findOne({
     email: req.body.email,
+    _id: { $ne: req.params.userid },
   });
-  if (
-    userWithGivenEmail &&
-    userWithGivenEmail._id.toString() !== req.params.userid
-  )
-    return res.status(400).json('Email already in use');
+  if (userWithGivenEmail) return res.status(400).json('Email already in use');
 
   /** Get user from db */
   const user = await req.context.models.User.findById(req.params.userid);
@@ -81,13 +72,6 @@ export async function userPut(req, res, next) {
 }
 
 export async function userDelete(req, res, next) {
-  /**
-   * Only let logged in user delete their own account if not an admin
-   */
-  const isLoggedInUser = req.user._id === req.params.userid;
-  if (!isLoggedInUser && !req.user.isAdmin)
-    return res.status(403).json(`Forbidden: Cannot delete another user's data`);
-
   /** Get user from db and remove */
   const user = await req.context.models.User.findById(req.params.userid);
   if (user) await user.remove();
