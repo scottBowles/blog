@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import { isValidObjectId } from '../models/utils.js';
 
 export async function postsGet(req, res, next) {
   const posts = await req.context.models.Post.find();
@@ -26,22 +25,12 @@ export async function postsPost(req, res, next) {
 }
 
 export async function postGet(req, res, next) {
-  const { postid } = req.params;
-
-  if (!isValidObjectId(postid)) {
-    return res.status(400).json('Invalid postid');
-  }
-
-  const post = await req.context.models.Post.findById(postid);
+  const post = await req.context.models.Post.findById(req.params.postid);
+  if (!post) return res.status(404).json('Post not found');
   return res.json(post);
 }
 
 export async function postPut(req, res, next) {
-  /** Ensure req.params.postid is a valid objectid */
-  if (!isValidObjectId(req.params.postid)) {
-    return res.status(400).json('Invalid postid');
-  }
-
   /** Validate incoming data. If user isn't provided, assume logged in user */
   const { error } = req.context.validate.post({
     ...req.body,
@@ -67,11 +56,6 @@ export async function postPut(req, res, next) {
 }
 
 export async function postDelete(req, res, next) {
-  /** Ensure req.params.postid is a valid objectid */
-  if (!isValidObjectId(req.params.postid)) {
-    return res.status(400).json('Invalid postid');
-  }
-
   /** Get post from db */
   const post = await req.context.models.Post.findById(req.params.postid);
   if (!post) return res.status(404).json('Post not found');
@@ -88,13 +72,9 @@ export async function postDelete(req, res, next) {
 }
 
 export async function postCommentsGet(req, res, next) {
-  const { postid } = req.params;
-
-  if (!isValidObjectId(postid)) {
-    return res.status(400).json('Invalid postid');
-  }
-
-  const comments = await req.context.models.Comment.find({ post: postid });
+  const comments = await req.context.models.Comment.find({
+    post: req.params.postid,
+  });
   return res.json(comments);
 }
 
@@ -115,30 +95,14 @@ export async function postCommentsPost(req, res, next) {
 }
 
 export async function postCommentGet(req, res, next) {
-  const { commentid } = req.params;
-
-  if (!isValidObjectId(commentid)) {
-    return res.status(400).json('Invalid commentid');
-  }
-
-  const comment = await req.context.models.Comment.findById(commentid);
+  const comment = await req.context.models.Comment.findById(
+    req.params.commentid
+  );
   if (!comment) return res.status(404).json('Comment not found');
   return res.json(comment);
 }
 
-/**
- * Probably shouldn't allow comments to be updated. In current implementation
- * comments do not belong to a user, so there is no way to ensure a comment
- * isn't edited maliciously (even if only by a post's author).
- *
- * If we do keep this route, we'll want to verify comment belongs to post if
- * we want to verify post belongs to user.
- */
 export async function postCommentPut(req, res, next) {
-  /** Ensure req.params.commentid is a valid objectid */
-  if (!isValidObjectId(req.params.commentid))
-    return res.status(400).json('Invalid commentid');
-
   /** Validate incoming data */
   const { error } = req.context.validate.comment({
     ...req.body,
@@ -162,14 +126,6 @@ export async function postCommentPut(req, res, next) {
 }
 
 export async function postCommentDelete(req, res, next) {
-  /** Ensure req.params.commentid && req.params.postid are valid objectids */
-  if (
-    !isValidObjectId(req.params.commentid) ||
-    !isValidObjectId(req.params.postid)
-  ) {
-    return res.status(400).json('Invalid parameter id');
-  }
-
   /** Get post from db */
   const post = await req.context.models.Post.findById(req.params.postid);
   if (!post) return res.status(404).json('Post not found');

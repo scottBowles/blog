@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import bcrypt from 'bcrypt';
-import { isValidObjectId } from '../models/utils.js';
 
 export async function usersGet(req, res, next) {
   const users = await req.context.models.User.find();
@@ -35,10 +34,6 @@ export async function usersPost(req, res, next) {
 }
 
 export async function userGet(req, res, next) {
-  if (!isValidObjectId(req.params.userid)) {
-    return res.status(400).json('Invalid userid');
-  }
-
   const user = await req.context.models.User.findById(req.params.userid);
   if (!user) return res.status(404).json('User not found');
 
@@ -48,7 +43,6 @@ export async function userGet(req, res, next) {
 export async function userPut(req, res, next) {
   /**
    * Only let logged in user change their own data if not an admin
-   * This also ensures req.params.userid is a valid objectid
    */
   const isLoggedInUser = req.user._id === req.params.userid;
   if (!isLoggedInUser && !req.user.isAdmin)
@@ -89,7 +83,6 @@ export async function userPut(req, res, next) {
 export async function userDelete(req, res, next) {
   /**
    * Only let logged in user delete their own account if not an admin
-   * This also ensures req.params.userid is a valid objectid
    */
   const isLoggedInUser = req.user._id === req.params.userid;
   if (!isLoggedInUser && !req.user.isAdmin)
@@ -103,10 +96,6 @@ export async function userDelete(req, res, next) {
 }
 
 export async function userPostsGet(req, res, next) {
-  if (!isValidObjectId(req.params.userid)) {
-    return res.status(400).json('Invalid userid');
-  }
-
   const posts = await req.context.models.Post.find({ user: req.params.userid });
   return res.json(posts);
 }
