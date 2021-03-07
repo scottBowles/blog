@@ -5,10 +5,15 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export default function () {
+  const connectionString =
+    process.env.NODE_ENV === 'test'
+      ? process.env.DB_URI_TEST
+      : process.env.DB_URI;
+
   mongoose
-    .connect(process.env.DB_URI, {
+    .connect(connectionString, {
       useNewUrlParser: true,
-      useUnifiedTopology: true,
+      useUnifiedTopology: false,
       useFindAndModify: false,
       useCreateIndex: true,
     })

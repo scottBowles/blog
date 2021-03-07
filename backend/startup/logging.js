@@ -1,5 +1,5 @@
 import winston from 'winston';
-import 'winston-mongodb';
+// import 'winston-mongodb';
 import 'express-async-errors';
 
 export default function () {
@@ -16,10 +16,10 @@ export default function () {
     new winston.transports.File({ filename: '../logfile.log', level: 'error' })
   );
 
-  winston.add(
-    new winston.transports.MongoDB({
-      db: process.env.DB_URI,
-      options: { useUnifiedTopology: true },
-    })
-  );
+  // winston.add(
+  //   new winston.transports.MongoDB({
+  //     db: process.env.DB_URI,
+  //     options: { useUnifiedTopology: true },
+  //   })
+  // );
 }

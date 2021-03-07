@@ -1,7 +1,8 @@
 import express from 'express';
 
-import auth from '../middleware/auth.js';
 import * as userController from '../controllers/userController.js';
+import auth from '../middleware/auth.js';
+import adminOrSelf from '../middleware/adminOrSelf.js';
 import validateObjectId from '../middleware/validateObjectId.js';
 
 const router = express.Router();
@@ -13,12 +14,14 @@ router.get('/:userid', validateObjectId('userid'), userController.userGet);
 router.put(
   '/:userid',
   auth,
+  adminOrSelf,
   validateObjectId('userid'),
   userController.userPut
 );
 router.delete(
   '/:userid',
   auth,
+  adminOrSelf,
   validateObjectId('userid'),
   userController.userDelete
 );
