@@ -147,7 +147,7 @@ export async function postCommentDelete(req, res, next) {
       .json('Comment does not belong to the post in provided uri');
 
   /** Remove comment */
-  if (comment) comment.remove();
+  if (comment) await comment.remove();
 
   return res.json(comment);
 }
