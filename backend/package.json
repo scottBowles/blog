@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "nodemon --exec babel-node server.js",
-    "test": "jest --no-cache --watchAll --verbose --maxWorkers=1 --coverage"
+    "test": "jest --no-cache --watch --verbose --maxWorkers=1 --coverage --onlyChanged"
   },
   "author": "",
   "license": "ISC",
