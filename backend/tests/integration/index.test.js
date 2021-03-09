@@ -18,7 +18,7 @@ describe('/', () => {
     await Post.remove({});
     await User.remove({});
     await Comment.remove({});
-    server.close();
+    await server.close();
   });
 
   describe('GET /me', () => {

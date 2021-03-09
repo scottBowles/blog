@@ -12,7 +12,7 @@ describe('auth middleware', () => {
   });
   afterEach(async () => {
     await Post.remove({});
-    server.close();
+    await server.close();
   });
 
   let token;
