@@ -46,7 +46,6 @@ export async function userPut(req, res, next) {
   if (error) return res.status(400).json(error.details[0].message);
 
   /** Ensure email is still unique */
-  /// /////// NEED TO TEST /////// ///
   const userWithGivenEmail = await req.context.models.User.findOne({
     email: req.body.email,
     _id: { $ne: req.params.userid },
@@ -68,7 +67,9 @@ export async function userPut(req, res, next) {
   user.password = hashed;
   const updatedUser = await user.save();
 
-  return res.json(updatedUser);
+  return res.json(
+    _.pick(updatedUser, ['_id', 'firstName', 'lastName', 'email', 'fullName'])
+  );
 }
 
 export async function userDelete(req, res, next) {
