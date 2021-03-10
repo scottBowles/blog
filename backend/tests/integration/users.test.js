@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { mongo } from 'mongoose';
 import 'regenerator-runtime/runtime';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
@@ -194,15 +194,171 @@ describe('/users', () => {
     });
   });
 
-  describe(`PUT /users/:userid`, () => {
-    // validators
-    // 401 if no token
-    // 400 if invalid token
-    // 403 if not admin or self
-    // 400 if invalid userid objectid
-    // 400 if email already in use by other user
-    // 404 if user not found
-    // should update user
-    // should return updated user with hashed password
+  describe(`PUT /:userid`, () => {
+    let userid;
+    let token;
+    let initialUserPayload;
+    let updatePayload;
+
+    const exec = () =>
+      request(server)
+        .put(`/users/${userid}`)
+        .set('x-auth-token', token)
+        .send(updatePayload);
+
+    beforeEach(async () => {
+      userid = mongoose.Types.ObjectId();
+      initialUserPayload = {
+        _id: userid,
+        firstName: 'f',
+        lastName: 'l',
+        email: 'e@mail.com',
+        password: 'password',
+      };
+
+      const user = await User.create(initialUserPayload);
+
+      token = user.generateAuthToken();
+
+      updatePayload = {
+        firstName: 'newFirst',
+        lastName: 'newLast',
+        email: 'new@email.com',
+        password: 'newPassword',
+      };
+    });
+
+    // validateUser tested elsewhere
+    // 400 validateObjectId middleware tested elsewhere
+    // 401/400 auth middleware tested elsewhere
+
+    it(`should return 403 if request user is neither an admin nor the user being updated`, async () => {
+      token = new User().generateAuthToken();
+      const res = await exec();
+      expect(res.status).toBe(403);
+    });
+
+    it(`should return 400 if new email is already in use by another user`, async () => {
+      await User.create(updatePayload);
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it(`should return 404 if user not found`, async () => {
+      await User.remove({});
+      const res = await exec();
+
+      expect(res.status).toBe(404);
+    });
+
+    it(`should update the user with password hashed`, async () => {
+      const res = await exec();
+      const user = await User.findById(userid);
+
+      expect(res.status).toBe(200);
+      expect(user.firstName).toBe(updatePayload.firstName);
+      expect(user.email).toBe(updatePayload.email);
+      expect(user.password).not.toBe(updatePayload.password);
+    });
+
+    it(`should return the updated user without password`, async () => {
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('firstName', updatePayload.firstName);
+      expect(res.body).not.toHaveProperty('password');
+    });
+  });
+
+  describe(`DELETE /:userid`, () => {
+    let userid;
+    let token;
+    let userPayload;
+
+    const exec = () =>
+      request(server).delete(`/users/${userid}`).set('x-auth-token', token);
+
+    beforeEach(async () => {
+      userid = mongoose.Types.ObjectId();
+
+      userPayload = {
+        _id: userid.toHexString(),
+        firstName: 'f',
+        lastName: 'l',
+        email: 'e@mail.com',
+        password: 'password',
+      };
+
+      const user = await User.create(userPayload);
+
+      token = user.generateAuthToken();
+    });
+
+    // 400/401 auth middleware tested elsewhere
+    // 403 adminOrSelf middleware tested elsewhere
+    // validateObjectId middleware tested elsewhere
+
+    it(`should delete the user and return the deleted user`, async () => {
+      const res = await exec();
+      const noLongerExistingUser = await User.findById(userid);
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('_id', userPayload._id);
+      expect(res.body).toHaveProperty('firstName', userPayload.firstName);
+      expect(noLongerExistingUser).toBeFalsy();
+    });
+
+    it(`should not crash if user not found`, async () => {
+      await User.remove({});
+      const res = await exec();
+      expect(res.status).toBe(200);
+      expect(res.body).toBeFalsy();
+    });
+  });
+
+  describe(`GET /:userid/posts`, () => {
+    let userid;
+
+    const exec = () => request(server).get(`/users/${userid}/posts`);
+
+    beforeEach(async () => {
+      userid = mongoose.Types.ObjectId();
+      await Post.collection.insertMany([
+        {
+          title: 'test1',
+          text: 'test1',
+          user: userid,
+        },
+        {
+          title: 'test2',
+          text: 'test2',
+          user: userid,
+        },
+        {
+          title: 'test3',
+          text: 'test3',
+          user: userid,
+        },
+      ]);
+    });
+
+    // validateObjectId middleware tested elsewhere
+
+    it(`should return posts`, async () => {
+      const res = await exec();
+      expect(res.status).toBe(200);
+      expect(res.body.length).toBe(3);
+      expect(res.body.some((p) => p.title === 'test1'));
+      expect(res.body.some((p) => p.title === 'test2'));
+      expect(res.body.some((p) => p.title === 'test3'));
+    });
+
+    it(`shouldn't crash if user not found`, async () => {
+      userid = mongoose.Types.ObjectId();
+      const res = await exec();
+      expect(res.status).toBe(200);
+      // should return an empty array
+      expect(res.body.length).toBe(0);
+    });
   });
 });
