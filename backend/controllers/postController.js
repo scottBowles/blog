@@ -26,8 +26,15 @@ export async function postsPost(req, res, next) {
 }
 
 export async function postGet(req, res, next) {
+  /** Get post from db */
   const post = await req.context.models.Post.findById(req.params.postid);
   if (!post) return res.status(404).json('Post not found');
+
+  /** If post is not published, only allow access for post author and admins */
+  const isUsersPost = post.user.toString() === req.user?._id;
+  if (!post.isPublished && !isUsersPost && !req.user?.isAdmin)
+    return res.status(403).json(`Forbidden: Cannot access post`);
+
   return res.json(post);
 }
 
@@ -66,6 +73,10 @@ export async function postDelete(req, res, next) {
 }
 
 export async function postCommentsGet(req, res, next) {
+  const post = await req.context.models.Post.findById(req.params.postid);
+  if (!post?.isPublished)
+    return res.status(403).json('Cannot access comments on unpublished posts');
+
   const comments = await req.context.models.Comment.find({
     post: req.params.postid,
   });
@@ -78,6 +89,9 @@ export async function postCommentsPost(req, res, next) {
   const post = await req.context.models.Post.findById(req.params.postid);
   if (!post) return res.status(404).json('Post not found');
 
+  if (!post.isPublished)
+    return res.status(403).json('Cannot post comments to an unpublished post');
+
   const comment = await req.context.models.Comment.create({
     text,
     author,
@@ -88,10 +102,18 @@ export async function postCommentsPost(req, res, next) {
 }
 
 export async function postCommentGet(req, res, next) {
+  const post = await req.context.models.Post.findById(req.params.postid);
   const comment = await req.context.models.Comment.findById(
     req.params.commentid
   );
   if (!comment) return res.status(404).json('Comment not found');
+
+  if (!post?.isPublished)
+    return res.status(404).json('Published post not found');
+
+  if (!post._id.equals(comment.post))
+    return res.status(400).json('Comment does not belong to given postid');
+
   return res.json(comment);
 }
 

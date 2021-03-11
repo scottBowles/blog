@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { mongo } from 'mongoose';
 import 'regenerator-runtime/runtime';
 import request from 'supertest';
 import { Post } from '../../models/post.js';
@@ -164,15 +164,51 @@ describe('/posts', () => {
   });
 
   describe('GET /:postid', () => {
-    it('should return a post if valid id is passed', async () => {
-      const payload = {
+    let payload;
+    let postid;
+    let token;
+
+    const exec = async () => {
+      await Post.create(payload);
+      return request(server).get(`/posts/${postid}`).set('x-auth-token', token);
+    };
+
+    beforeEach(async () => {
+      postid = mongoose.Types.ObjectId();
+      token = '';
+      payload = {
+        _id: postid.toHexString(),
         title: 'post1',
         text: 'post1 text',
         isPublished: true,
         user: mongoose.Types.ObjectId(),
       };
-      const post = await Post.create(payload);
-      const res = await request(server).get(`/posts/${post._id}`);
+    });
+
+    it('should return post if post is published', async () => {
+      const res = await exec();
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('title', payload.title);
+      expect(res.body).toHaveProperty('text', payload.text);
+      expect(res.body).toHaveProperty('isPublished', payload.isPublished);
+      expect(res.body).toHaveProperty('user', payload.user.toHexString());
+    });
+
+    it('should return post if post is unpublished but user is admin', async () => {
+      payload.isPublished = false;
+      token = new User({ isAdmin: true }).generateAuthToken();
+      const res = await exec();
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('title', payload.title);
+      expect(res.body).toHaveProperty('text', payload.text);
+      expect(res.body).toHaveProperty('isPublished', payload.isPublished);
+      expect(res.body).toHaveProperty('user', payload.user.toHexString());
+    });
+
+    it('should return post if post is unpublished but user is author', async () => {
+      payload.isPublished = false;
+      token = new User({ _id: payload.user }).generateAuthToken();
+      const res = await exec();
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty('title', payload.title);
       expect(res.body).toHaveProperty('text', payload.text);
@@ -181,15 +217,22 @@ describe('/posts', () => {
     });
 
     it('should return 400 for invalid object id', async () => {
-      const res = await request(server).get('/posts/1');
+      postid = 1;
+      const res = await exec();
       expect(res.status).toBe(400);
     });
 
     it('should return 404 if no post with the given postid exists', async () => {
-      const validId = mongoose.Types.ObjectId();
-      const res = await request(server).get(`/posts/${validId}`);
+      postid = mongoose.Types.ObjectId();
+      const res = await exec();
       expect(res.status).toBe(404);
     });
+
+    it(`should return 403 if post is unpublished and user is neither post author nor an admin`, async () => {
+      payload.isPublished = false;
+      const res = await exec();
+      expect(res.status).toBe(403);
+    })
   });
 
   describe('PUT /:postid', () => {
@@ -435,42 +478,62 @@ describe('/posts', () => {
   });
 
   describe(`GET /:postid/comments`, () => {
-    it(`should return 400 if postid is an invalid objectid`, async () => {
-      const postid = 1234;
-      const res = await request(server).get(`/posts/${postid}/comments`);
+    let postid;
+    let userid;
+    let postPayload;
 
-      expect(res.status).toBe(400);
-    });
-
-    it(`should return the given posts' comments`, async () => {
-      const postid = mongoose.Types.ObjectId();
-      const userid = mongoose.Types.ObjectId();
-      const postPayload = {
-        _id: postid,
-        title: 'testTitle',
-        text: 'testText',
-        isPublished: false,
-        user: userid.toHexString(),
-      };
-      const post = await Post.create(postPayload);
+    const createPostAndComments = async () => {
+      await Post.create(postPayload);
       await Comment.create({
         text: 'comment1Text',
         author: 'comment1Author',
         email: 'test@email.com',
-        post: post._id,
+        post: postid,
       });
       await Comment.create({
         text: 'comment2Text',
         author: 'comment2Author',
         email: 'test@email.com',
-        post: post._id,
+        post: postid,
       });
       await Comment.create({
         text: 'comment3Text',
         author: 'comment3Author',
         email: 'test@email.com',
-        post: post._id,
+        post: postid,
       });
+    };
+
+    const exec = () => request(server).get(`/posts/${postid}/comments`);
+
+    beforeEach(() => {
+      postid = mongoose.Types.ObjectId();
+      userid = mongoose.Types.ObjectId();
+      postPayload = {
+        _id: postid,
+        title: 'testTitle',
+        text: 'testText',
+        isPublished: true,
+        user: userid.toHexString(),
+      };
+    });
+
+    it(`should return 400 if postid is an invalid objectid`, async () => {
+      postid = 1234;
+      const res = await exec();
+      expect(res.status).toBe(400);
+    });
+
+    it(`should return 403 if post is unpublished`, async () => {
+      postPayload.isPublished = false;
+      await createPostAndComments();
+      const res = await request(server).get(`/posts/${postid}/comments`);
+
+      expect(res.status).toBe(403);
+    });
+
+    it(`should return the given posts' comments`, async () => {
+      await createPostAndComments();
       const res = await request(server).get(`/posts/${postid}/comments`);
 
       expect(res.status).toBe(200);
@@ -484,8 +547,12 @@ describe('/posts', () => {
   describe(`POST /:postid/comments`, () => {
     let postid;
     let reqPayload;
-    const exec = () =>
-      request(server).post(`/posts/${postid}/comments`).send(reqPayload);
+    let postPayload;
+
+    const exec = async () => {
+      await Post.create(postPayload);
+      return request(server).post(`/posts/${postid}/comments`).send(reqPayload);
+    };
 
     beforeEach(async () => {
       postid = mongoose.Types.ObjectId();
@@ -495,14 +562,20 @@ describe('/posts', () => {
         email: 'test@email.com',
         post: postid.toHexString(),
       };
-      await Post.create({
+      postPayload = {
         _id: postid,
         title: 'testTitle',
         text: 'testText',
-        isPublished: false,
+        isPublished: true,
         user: mongoose.Types.ObjectId(),
-      });
+      };
     });
+
+    it(`should return 403 if post is unpublished`, async () => {
+      postPayload.isPublished = false;
+      const res = await exec();
+      expect(res.status).toBe(403);
+    })
 
     it(`should return 400 if postid is an invalid objectid`, async () => {
       postid = 1234;
@@ -565,13 +638,24 @@ describe('/posts', () => {
   describe(`GET /:postid/comments/:commentid`, () => {
     let postid;
     let commentid;
+    let postPayload;
     let commentPayload;
 
-    const exec = () =>
-      request(server).get(`/posts/${postid}/comments/${commentid}`);
+    const exec = async () => {
+      await Post.create(postPayload);
+      await Comment.create(commentPayload);
+      return request(server).get(`/posts/${postid}/comments/${commentid}`);
+    };
 
     beforeEach(async () => {
       postid = mongoose.Types.ObjectId();
+      postPayload = {
+        _id: postid,
+        title: 'title',
+        text: 'text',
+        isPublished: true,
+        user: mongoose.Types.ObjectId(),
+      };
       commentid = mongoose.Types.ObjectId();
       commentPayload = {
         _id: commentid.toHexString(),
@@ -580,7 +664,24 @@ describe('/posts', () => {
         email: 'test@email.com',
         post: postid.toHexString(),
       };
-      await Comment.create(commentPayload);
+    });
+
+    it(`should return 400 if comment's post does not match given postid`, async () => {
+      commentPayload.post = mongoose.Types.ObjectId().toHexString();
+      const res = await exec();
+      expect(res.status).toBe(400);
+    });
+
+    it(`should return 404 if post not found`, async () => {
+      postPayload._id = mongoose.Types.ObjectId();
+      const res = await exec();
+      expect(res.status).toBe(404);
+    });
+
+    it(`should return 404 if post is unpublished`, async () => {
+      postPayload.isPublished = false;
+      const res = await exec();
+      expect(res.status).toBe(404);
     });
 
     it(`should return 400 if postid is invalid objectid`, async () => {
