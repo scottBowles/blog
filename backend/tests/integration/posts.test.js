@@ -199,6 +199,10 @@ describe('/posts', () => {
     });
 
     it('should return 401 if no jwt is provided', async () => {
+      /**
+       * Ensures the auth middleware is in place. 400 for invalid jwt is not
+       * tested here but is covered in the auth middleware's unit test
+       */
       await createUser();
       await createPost();
       const res = await request(server)
@@ -206,15 +210,6 @@ describe('/posts', () => {
         .send(updatePayload);
 
       expect(res.status).toBe(401);
-    });
-
-    it('should return 400 if invalid jwt is provided', async () => {
-      await createUser();
-      token = '1234';
-      await createPost();
-      const res = await exec();
-
-      expect(res.status).toBe(400);
     });
 
     it('should return 400 if invalid objectid passed for postid', async () => {
@@ -362,17 +357,13 @@ describe('/posts', () => {
     });
 
     it(`should return 401 if no jwt is provided`, async () => {
+      /**
+       * Ensures the auth middleware is in place. 400 for invalid jwt is not
+       * tested here but is covered in the auth middleware's unit test
+       */
       const res = await request(server).delete(`/posts/${postid}`);
 
       expect(res.status).toBe(401);
-    });
-
-    it(`should return 400 if invalid jwt is provided`, async () => {
-      const res = await request(server)
-        .delete(`/posts/${postid}`)
-        .set('x-auth-token', 1234);
-
-      expect(res.status).toBe(400);
     });
 
     it(`should return 400 if postid is an invalid objectid`, async () => {
@@ -621,6 +612,10 @@ describe('/posts', () => {
     });
 
     it(`should return 401 if no token provided`, async () => {
+      /**
+       * Ensures the auth middleware is in place. 400 for invalid jwt is not
+       * tested here but is covered in the auth middleware's unit test
+       */
       const res = await request(server).put(
         `/posts/${postid}/comments/${commentid}`
       );
@@ -759,26 +754,26 @@ describe('/posts', () => {
     });
 
     it(`should return 401 if no jwt provided`, async () => {
+      /**
+       * Ensures the auth middleware is in place. 400 for invalid jwt is not
+       * tested here but is covered in the auth middleware's unit test
+       */
       const res = await request(server).delete(
         `/posts/${postid}/comments/${commentid}`
       );
       expect(res.status).toBe(401);
     });
 
-    it(`should return 400 if invalid jwt provided`, async () => {
-      token = '1234';
-      const res = await exec();
-      expect(res.status).toBe(400);
-    });
-
     it(`should return 400 if postid is an invalid objectid`, async () => {
       postid = 1234;
+      await createToken();
       const res = await exec();
       expect(res.status).toBe(400);
     });
 
     it(`should return 400 if commentid is an invalid objectid`, async () => {
       commentid = 1234;
+      await createToken();
       const res = await exec();
       expect(res.status).toBe(400);
     });

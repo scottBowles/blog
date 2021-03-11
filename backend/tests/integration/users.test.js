@@ -1,4 +1,4 @@
-import mongoose, { mongo } from 'mongoose';
+import mongoose from 'mongoose';
 import 'regenerator-runtime/runtime';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
@@ -230,7 +230,16 @@ describe('/users', () => {
 
     // validateUser tested elsewhere
     // 400 validateObjectId middleware tested elsewhere
-    // 401/400 auth middleware tested elsewhere
+
+    it(`should return 401 if no jwt is provided`, async () => {
+      /**
+       * Ensures the auth middleware is in place. 400 for invalid jwt is not
+       * tested here but is covered in the auth middleware's unit test
+       */
+      token = '';
+      const res = await exec();
+      expect(res.status).toBe(401);
+    });
 
     it(`should return 403 if request user is neither an admin nor the user being updated`, async () => {
       token = new User().generateAuthToken();
@@ -295,9 +304,18 @@ describe('/users', () => {
       token = user.generateAuthToken();
     });
 
-    // 400/401 auth middleware tested elsewhere
     // 403 adminOrSelf middleware tested elsewhere
     // validateObjectId middleware tested elsewhere
+
+    it(`should return 401 if no jwt is provided`, async () => {
+      /**
+       * Ensures the auth middleware is in place. 400 for invalid jwt is not
+       * tested here but is covered in the auth middleware's unit test
+       */
+      token = '';
+      const res = await exec();
+      expect(res.status).toBe(401);
+    });
 
     it(`should delete the user and return the deleted user`, async () => {
       const res = await exec();
