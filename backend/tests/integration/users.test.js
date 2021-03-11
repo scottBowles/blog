@@ -229,13 +229,13 @@ describe('/users', () => {
     });
 
     // validateUser tested elsewhere
-    // 400 validateObjectId middleware tested elsewhere
+    it(`should return 400 if userid is an invalid objectid`, async () => {
+      userid = 1234;
+      const res = await exec();
+      expect(res.status).toBe(400);
+    });
 
     it(`should return 401 if no jwt is provided`, async () => {
-      /**
-       * Ensures the auth middleware is in place. 400 for invalid jwt is not
-       * tested here but is covered in the auth middleware's unit test
-       */
       token = '';
       const res = await exec();
       expect(res.status).toBe(401);
@@ -305,13 +305,13 @@ describe('/users', () => {
     });
 
     // 403 adminOrSelf middleware tested elsewhere
-    // validateObjectId middleware tested elsewhere
+    it(`should return 400 if userid is invalid objectid`, async () => {
+      userid = 1234;
+      const res = await exec();
+      expect(res.status).toBe(400);
+    })
 
     it(`should return 401 if no jwt is provided`, async () => {
-      /**
-       * Ensures the auth middleware is in place. 400 for invalid jwt is not
-       * tested here but is covered in the auth middleware's unit test
-       */
       token = '';
       const res = await exec();
       expect(res.status).toBe(401);
@@ -360,7 +360,11 @@ describe('/users', () => {
       ]);
     });
 
-    // validateObjectId middleware tested elsewhere
+    it(`should return 400 if userid is an invalid objectid`, async () => {
+      userid = 1234;
+      const res = await exec();
+      expect(res.status).toBe(400);
+    })
 
     it(`should return posts`, async () => {
       const res = await exec();
