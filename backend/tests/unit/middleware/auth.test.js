@@ -6,6 +6,11 @@ import auth from '../../../middleware/auth.js';
 
 dotenv.config();
 
+/**
+ * NOTE: The auth middleware's execution checks are tested in its integration
+ * test. This unit test only checks that the user is added to the request object
+ */
+
 describe('auth middleware', () => {
   it('should populate req.user with the payload of a valid JWT', () => {
     const user = {

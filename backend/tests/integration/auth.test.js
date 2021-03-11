@@ -4,6 +4,12 @@ import app from '../../startup/app.js';
 import { User } from '../../models/user.js';
 import { Post } from '../../models/post.js';
 
+/**
+ * NOTE: This test checks each execution path but does not have access to the
+ * request object in media res, so it is unable to test that req.user is added
+ * correctly. That is tested in the auth.test.js unit test.
+ */
+
 let server;
 
 describe('auth middleware', () => {
