@@ -6,20 +6,14 @@ export async function postsGet(req, res, next) {
 }
 
 export async function postsPost(req, res, next) {
-  /**
-   * Validate incoming data.
-   * Use logged in user. Users can only post to their own accounts.
-   */
-  const { value, error } = req.context.validate.post({
-    ...req.body,
+  const { title, text, isPublished } = req.body;
+  /** Create post */
+  const post = await req.context.models.Post.create({
+    title,
+    text,
+    isPublished,
     user: req.user._id,
   });
-  if (error) return res.status(400).send(error.details[0].message);
-
-  /** Create post */
-  const post = await req.context.models.Post.create(
-    _.pick(value, ['title', 'text', 'isPublished', 'user'])
-  );
 
   return res.json(post);
 }
@@ -31,13 +25,6 @@ export async function postGet(req, res, next) {
 }
 
 export async function postPut(req, res, next) {
-  /** Validate incoming data. If user isn't provided, assume logged in user */
-  const { error } = req.context.validate.post({
-    ...req.body,
-    user: req.body.user || req.user._id,
-  });
-  if (error) return res.status(400).send(error.details[0].message);
-
   /** Get post from db */
   const post = await req.context.models.Post.findById(req.params.postid);
   if (!post) return res.status(404).send('Post not found');
@@ -79,18 +66,17 @@ export async function postCommentsGet(req, res, next) {
 }
 
 export async function postCommentsPost(req, res, next) {
-  const { value, error } = req.context.validate.comment({
-    ...req.body,
-    post: req.params.postid,
-  });
-  if (error) return res.status(400).json(error.details[0].message);
+  const { text, author, email } = req.body;
 
   const post = await req.context.models.Post.findById(req.params.postid);
   if (!post) return res.status(404).json('Post not found');
 
-  const comment = await req.context.models.Comment.create(
-    _.pick(value, ['text', 'author', 'email', 'post'])
-  );
+  const comment = await req.context.models.Comment.create({
+    text,
+    author,
+    email,
+    post: req.params.postid,
+  });
   return res.json(comment);
 }
 
@@ -103,13 +89,6 @@ export async function postCommentGet(req, res, next) {
 }
 
 export async function postCommentPut(req, res, next) {
-  /** Validate incoming data */
-  const { error } = req.context.validate.comment({
-    ...req.body,
-    post: req.params.postid,
-  });
-  if (error) return res.status(400).send(error.details[0].message);
-
   /** Get comment from db */
   const comment = await req.context.models.Comment.findById(
     req.params.commentid

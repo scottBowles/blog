@@ -7,12 +7,9 @@ export async function usersGet(req, res, next) {
 }
 
 export async function usersPost(req, res, next) {
-  const { error } = req.context.validate.user(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  const { firstName, lastName, email } = req.body;
 
-  const existingUser = await req.context.models.User.findOne({
-    email: req.body.email,
-  });
+  const existingUser = await req.context.models.User.findOne({ email });
   if (existingUser) return res.status(400).json('User already registered');
 
   // Hash the password before storing it
@@ -20,9 +17,9 @@ export async function usersPost(req, res, next) {
   const hashed = await bcrypt.hash(req.body.password, salt);
 
   const user = await req.context.models.User.create({
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    email: req.body.email,
+    firstName,
+    lastName,
+    email,
     password: hashed,
   });
 
@@ -30,6 +27,7 @@ export async function usersPost(req, res, next) {
 
   return res
     .header('x-auth-token', token)
+    .header('access-control-expose-headers', 'x-auth-token')
     .json(_.pick(user, ['_id', 'firstName', 'lastName', 'email', 'fullName']));
 }
 
@@ -41,10 +39,6 @@ export async function userGet(req, res, next) {
 }
 
 export async function userPut(req, res, next) {
-  /** Validate req.body */
-  const { error } = req.context.validate.user(req.body);
-  if (error) return res.status(400).json(error.details[0].message);
-
   /** Ensure email is still unique */
   const userWithGivenEmail = await req.context.models.User.findOne({
     email: req.body.email,

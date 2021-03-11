@@ -1,19 +1,31 @@
 import express from 'express';
+import * as postController from '../controllers/postController.js';
 import auth from '../middleware/auth.js';
 import admin from '../middleware/admin.js';
-import * as postController from '../controllers/postController.js';
+import validate from '../middleware/validate.js';
 import validateObjectId from '../middleware/validateObjectId';
+import { validatePost } from '../models/post';
+import { validateComment } from '../models/comment.js';
 
 const router = express.Router();
 
 router.get('/', postController.postsGet);
-router.post('/', auth, postController.postsPost);
+router.post(
+  '/',
+  auth,
+  validate(validatePost, (req) => ({ ...req.body, user: req.user._id })),
+  postController.postsPost
+);
 
 router.get('/:postid', validateObjectId('postid'), postController.postGet);
 router.put(
   '/:postid',
   auth,
   validateObjectId('postid'),
+  validate(validatePost, (req) => ({
+    ...req.body,
+    user: req.body.user || req.user._id,
+  })),
   postController.postPut
 );
 router.delete(
@@ -31,6 +43,10 @@ router.get(
 router.post(
   '/:postid/comments',
   validateObjectId('postid'),
+  validate(validateComment, (req) => ({
+    ...req.body,
+    post: req.params.postid,
+  })),
   postController.postCommentsPost
 );
 
@@ -46,6 +62,10 @@ router.put(
   admin,
   validateObjectId('postid'),
   validateObjectId('commentid'),
+  validate(validateComment, (req) => ({
+    ...req.body,
+    post: req.params.postid,
+  })),
   postController.postCommentPut
 );
 router.delete(
