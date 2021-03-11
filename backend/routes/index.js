@@ -1,6 +1,6 @@
 import express from 'express';
 import Joi from 'joi';
-import auth from '../middleware/auth.js';
+import protectedRoute from '../middleware/protectedRoute.js';
 import * as indexController from '../controllers/indexController.js';
 import validate from '../middleware/validate.js';
 
@@ -17,7 +17,7 @@ function validateLogin(user) {
 // What is the index route here? There's no obvious resource
 // router.get('/', (req, res) => {});
 
-router.get('/me', auth, indexController.me);
+router.get('/me', protectedRoute, indexController.me);
 router.post('/login', validate(validateLogin), indexController.login);
 
 export default router;

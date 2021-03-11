@@ -7,7 +7,7 @@ import auth from '../../../middleware/auth.js';
 dotenv.config();
 
 /**
- * NOTE: The auth middleware's execution checks are tested in its integration
+ * NOTE: The auth middleware's execution paths are tested in its integration
  * test. This unit test only checks that the user is added to the request object
  */
 

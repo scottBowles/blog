@@ -1,7 +1,7 @@
 import express from 'express';
 
 import * as userController from '../controllers/userController.js';
-import auth from '../middleware/auth.js';
+import protectedRoute from '../middleware/protectedRoute.js';
 import adminOrSelf from '../middleware/adminOrSelf.js';
 import validate from '../middleware/validate.js';
 import validateObjectId from '../middleware/validateObjectId.js';
@@ -15,14 +15,19 @@ router.post('/', validate(validateUser), userController.usersPost);
 router.get('/:userid', validateObjectId('userid'), userController.userGet);
 router.put(
   '/:userid',
-  [auth, adminOrSelf, validate(validateUser), validateObjectId('userid')],
+  [
+    validateObjectId('userid'),
+    protectedRoute,
+    validate(validateUser),
+    adminOrSelf,
+  ],
   userController.userPut
 );
 router.delete(
   '/:userid',
-  auth,
-  adminOrSelf,
   validateObjectId('userid'),
+  protectedRoute,
+  adminOrSelf,
   userController.userDelete
 );
 

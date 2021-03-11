@@ -6,6 +6,7 @@ import indexRouter from '../routes/index.js';
 import usersRouter from '../routes/users.js';
 import postsRouter from '../routes/posts.js';
 import errorHandler from '../middleware/error.js';
+import auth from '../middleware/auth.js';
 
 export default function (app) {
   /* Middleware */
@@ -14,9 +15,9 @@ export default function (app) {
   app.use(express.json());
 
   /* Routes */
-  app.use('/', indexRouter);
-  app.use('/users', usersRouter);
-  app.use('/posts', postsRouter);
+  app.use('/', auth, indexRouter);
+  app.use('/users', auth, usersRouter);
+  app.use('/posts', auth, postsRouter);
 
   /* Catch 404s and forward to error handler */
   app.use((req, res, next) => next(createError(404)));

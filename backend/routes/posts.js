@@ -1,6 +1,6 @@
 import express from 'express';
 import * as postController from '../controllers/postController.js';
-import auth from '../middleware/auth.js';
+import protectedRoute from '../middleware/protectedRoute.js';
 import admin from '../middleware/admin.js';
 import validate from '../middleware/validate.js';
 import validateObjectId from '../middleware/validateObjectId';
@@ -12,7 +12,7 @@ const router = express.Router();
 router.get('/', postController.postsGet);
 router.post(
   '/',
-  auth,
+  protectedRoute,
   validate(validatePost, (req) => ({ ...req.body, user: req.user._id })),
   postController.postsPost
 );
@@ -20,8 +20,8 @@ router.post(
 router.get('/:postid', validateObjectId('postid'), postController.postGet);
 router.put(
   '/:postid',
-  auth,
   validateObjectId('postid'),
+  protectedRoute,
   validate(validatePost, (req) => ({
     ...req.body,
     user: req.body.user || req.user._id,
@@ -30,8 +30,8 @@ router.put(
 );
 router.delete(
   '/:postid',
-  auth,
   validateObjectId('postid'),
+  protectedRoute,
   postController.postDelete
 );
 
@@ -58,21 +58,21 @@ router.get(
 );
 router.put(
   '/:postid/comments/:commentid',
-  auth,
-  admin,
   validateObjectId('postid'),
   validateObjectId('commentid'),
+  protectedRoute,
   validate(validateComment, (req) => ({
     ...req.body,
     post: req.params.postid,
   })),
+  admin,
   postController.postCommentPut
 );
 router.delete(
   '/:postid/comments/:commentid',
-  auth,
   validateObjectId('postid'),
   validateObjectId('commentid'),
+  protectedRoute,
   postController.postCommentDelete
 );
 
