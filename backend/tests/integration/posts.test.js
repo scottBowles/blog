@@ -20,7 +20,7 @@ describe('/posts', () => {
   });
 
   describe('GET /', () => {
-    it('should return all posts', async () => {
+    beforeEach(async () => {
       await Post.collection.insertMany([
         {
           title: 'post1',
@@ -31,7 +31,7 @@ describe('/posts', () => {
         {
           title: 'post2',
           text: 'post2 text',
-          isPublished: true,
+          isPublished: false,
           user: 2222222222222222,
         },
         {
@@ -40,13 +40,58 @@ describe('/posts', () => {
           isPublished: true,
           user: 3333333333333333,
         },
+        {
+          title: 'post4',
+          text: 'post4 text',
+          isPublished: true,
+          user: 3333333333333333,
+        },
       ]);
+    });
+
+    it('should return all published posts', async () => {
       const res = await request(server).get('/posts');
       expect(res.status).toBe(200);
       expect(res.body.length).toBe(3);
       expect(res.body.some((p) => p.title === 'post1')).toBeTruthy();
-      expect(res.body.some((p) => p.title === 'post2')).toBeTruthy();
+      expect(res.body.some((p) => p.title === 'post2')).toBeFalsy();
       expect(res.body.some((p) => p.title === 'post3')).toBeTruthy();
+      expect(res.body.some((p) => p.title === 'post4')).toBeTruthy();
+    });
+
+    it(`should return the 'take' number of posts if the take query string is provided`, async () => {
+      const res = await request(server).get(`/posts?limit=2`);
+      expect(res.status).toBe(200);
+      expect(res.body.length).toBe(2);
+    });
+
+    it(`should skip posts if skip query string is provided`, async () => {
+      const res = await request(server).get(`/posts?skip=2`);
+      expect(res.status).toBe(200);
+      expect(res.body.length).toBe(1);
+    });
+
+    it(`should include unpublished if includeunpublished query string is provided && user isAdmin`, async () => {
+      const token = await new User({
+        firstName: 'f',
+        lastName: 'l',
+        email: 'e@mail.com',
+        password: 'password',
+        isAdmin: true,
+      }).generateAuthToken();
+      const res = await request(server)
+        .get(`/posts?includeunpublished=true`)
+        .set('x-auth-token', token);
+      expect(res.status).toBe(200);
+      expect(res.body.length).toBe(4);
+    });
+
+    it(`should not include unpublished if includeunpublished qs is provider but user is not admin`, async () => {
+      const token = await new User().generateAuthToken();
+      const res = await request(server)
+        .get(`/posts?includeunpublished=true`)
+        .set('x-auth-token', token);
+      expect(res.body.length).toBe(3);
     });
   });
 
@@ -199,10 +244,6 @@ describe('/posts', () => {
     });
 
     it('should return 401 if no jwt is provided', async () => {
-      /**
-       * Ensures the auth middleware is in place. 400 for invalid jwt is not
-       * tested here but is covered in the auth middleware's unit test
-       */
       await createUser();
       await createPost();
       const res = await request(server)
@@ -357,10 +398,6 @@ describe('/posts', () => {
     });
 
     it(`should return 401 if no jwt is provided`, async () => {
-      /**
-       * Ensures the auth middleware is in place. 400 for invalid jwt is not
-       * tested here but is covered in the auth middleware's unit test
-       */
       const res = await request(server).delete(`/posts/${postid}`);
 
       expect(res.status).toBe(401);
@@ -612,13 +649,9 @@ describe('/posts', () => {
     });
 
     it(`should return 401 if no token provided`, async () => {
-      /**
-       * Ensures the auth middleware is in place. 400 for invalid jwt is not
-       * tested here but is covered in the auth middleware's unit test
-       */
-      const res = await request(server).put(
-        `/posts/${postid}/comments/${commentid}`
-      );
+      const res = await request(server)
+        .put(`/posts/${postid}/comments/${commentid}`)
+        .send(reqPayload);
       expect(res.status).toBe(401);
     });
 
@@ -754,10 +787,6 @@ describe('/posts', () => {
     });
 
     it(`should return 401 if no jwt provided`, async () => {
-      /**
-       * Ensures the auth middleware is in place. 400 for invalid jwt is not
-       * tested here but is covered in the auth middleware's unit test
-       */
       const res = await request(server).delete(
         `/posts/${postid}/comments/${commentid}`
       );

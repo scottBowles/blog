@@ -1,7 +1,14 @@
 import _ from 'lodash';
 
 export async function postsGet(req, res, next) {
-  const posts = await req.context.models.Post.find();
+  const limit = Number(req.query.limit);
+  const skip = Number(req.query.skip);
+  const includeunpublished =
+    req.user?.isAdmin && req.query.includeunpublished.toLowerCase() === 'true';
+  const filter = includeunpublished ? {} : { isPublished: true };
+  const posts = await req.context.models.Post.find(filter)
+    .skip(skip)
+    .limit(limit);
   return res.json(posts);
 }
 
