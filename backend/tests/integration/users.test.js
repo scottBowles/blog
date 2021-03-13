@@ -22,7 +22,13 @@ describe('/users', () => {
   });
 
   describe('GET /', () => {
-    it('should return all users', async () => {
+    let queryString;
+
+    const exec = () => request(server).get(`/users${queryString}`);
+
+    beforeEach(async () => {
+      queryString = '';
+
       await User.collection.insertMany([
         {
           firstName: 'first',
@@ -43,12 +49,30 @@ describe('/users', () => {
           password: 'password',
         },
       ]);
-      const res = await request(server).get('/users');
+    });
+
+    it('should return all users', async () => {
+      const res = await exec();
       expect(res.status).toBe(200);
       expect(res.body.length).toBe(3);
       expect(res.body.some((u) => u.email === 'e1@test.com')).toBeTruthy();
       expect(res.body.some((u) => u.email === 'e2@test.com')).toBeTruthy();
       expect(res.body.some((u) => u.email === 'e3@test.com')).toBeTruthy();
+    });
+
+    it(`should return limit number of users if limit query string is provided`, async () => {
+      queryString = '?limit=2';
+      const res = await exec();
+      expect(res.status).toBe(200);
+      expect(res.body.length).toBe(2);
+    });
+
+    it(`should skip given number of users if skip query string is provided`, async () => {
+      queryString = '?skip=1';
+      const res = await exec();
+      expect(res.status).toBe(200);
+      expect(res.body.length).toBe(2);
+      expect(res.body[0].email).toBe('e2@test.com');
     });
   });
   describe('POST /', () => {
@@ -309,7 +333,7 @@ describe('/users', () => {
       userid = 1234;
       const res = await exec();
       expect(res.status).toBe(400);
-    })
+    });
 
     it(`should return 401 if no jwt is provided`, async () => {
       token = '';
@@ -336,26 +360,46 @@ describe('/users', () => {
 
   describe(`GET /:userid/posts`, () => {
     let userid;
+    let token;
+    let queryString;
 
-    const exec = () => request(server).get(`/users/${userid}/posts`);
+    const exec = () =>
+      request(server)
+        .get(`/users/${userid}/posts${queryString}`)
+        .set('x-auth-token', token);
 
     beforeEach(async () => {
       userid = mongoose.Types.ObjectId();
+      queryString = '';
+
+      token = new User({
+        _id: userid,
+      }).generateAuthToken();
+
       await Post.collection.insertMany([
         {
           title: 'test1',
           text: 'test1',
           user: userid,
+          isPublished: true,
         },
         {
           title: 'test2',
           text: 'test2',
           user: userid,
+          isPublished: false,
         },
         {
           title: 'test3',
           text: 'test3',
           user: userid,
+          isPublished: true,
+        },
+        {
+          title: 'test4',
+          text: 'test4',
+          user: userid,
+          isPublished: true,
         },
       ]);
     });
@@ -364,15 +408,54 @@ describe('/users', () => {
       userid = 1234;
       const res = await exec();
       expect(res.status).toBe(400);
-    })
+    });
 
-    it(`should return posts`, async () => {
+    it(`should return limit number of posts if limit query string is provided`, async () => {
+      queryString = `?limit=2`;
+      const res = await exec();
+      expect(res.status).toBe(200);
+      expect(res.body.length).toBe(2);
+    });
+
+    it(`should skip number of posts if skip query string is provided`, async () => {
+      queryString = `?skip=1`;
+      const res = await exec();
+      expect(res.body.length).toBe(3);
+      expect(res.body[0].title).toBe('test2');
+    });
+
+    it(`should return all posts (including unpublished) if user is author`, async () => {
+      const res = await exec();
+      expect(res.status).toBe(200);
+      expect(res.body.length).toBe(4);
+      expect(res.body.some((p) => !p.isPublished)).toBeTruthy();
+    });
+
+    it(`should return all posts (including unpublished) if user is admin`, async () => {
+      token = new User({ isAdmin: true }).generateAuthToken();
+      const res = await exec();
+      expect(res.body.length).toBe(4);
+      expect(res.body.some((p) => !p.isPublished)).toBeTruthy();
+    });
+
+    it(`should return only published posts if user is not author or admin`, async () => {
+      token = new User().generateAuthToken();
       const res = await exec();
       expect(res.status).toBe(200);
       expect(res.body.length).toBe(3);
-      expect(res.body.some((p) => p.title === 'test1'));
-      expect(res.body.some((p) => p.title === 'test2'));
-      expect(res.body.some((p) => p.title === 'test3'));
+      expect(res.body.some((p) => !p.isPublished)).toBeFalsy();
+    });
+
+    it(`should return only published posts if no logged in user`, async () => {
+      token = '';
+      const res = await exec();
+      expect(res.status).toBe(200);
+      expect(res.body.length).toBe(3);
+      expect(res.body.some((p) => p.isPublished === false)).toBeFalsy();
+      expect(res.body.some((p) => p.title === 'test1')).toBeTruthy();
+      expect(res.body.some((p) => p.title === 'test2')).toBeFalsy();
+      expect(res.body.some((p) => p.title === 'test3')).toBeTruthy();
+      expect(res.body.some((p) => p.title === 'test4')).toBeTruthy();
     });
 
     it(`shouldn't crash if user not found`, async () => {

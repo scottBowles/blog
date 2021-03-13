@@ -2,7 +2,13 @@ import _ from 'lodash';
 import bcrypt from 'bcrypt';
 
 export async function usersGet(req, res, next) {
-  const users = await req.context.models.User.find();
+  /** Get query strings and convert to numbers */
+  const limit = Number(req.query.limit);
+  const skip = Number(req.query.skip);
+
+  /** Get users from db */
+  const users = await req.context.models.User.find().limit(limit).skip(skip);
+
   return res.json(users);
 }
 
@@ -75,6 +81,25 @@ export async function userDelete(req, res, next) {
 }
 
 export async function userPostsGet(req, res, next) {
-  const posts = await req.context.models.Post.find({ user: req.params.userid });
+  /** Get query strings and convert to numbers */
+  const limit = Number(req.query.limit);
+  const skip = Number(req.query.skip);
+
+  /** Define query filter */
+  const filter = { user: req.params.userid };
+
+  /**
+   * If no logged in user, or if user is neither admin nor author, filter to
+   * return only published posts.
+   */
+  const userIsAdmin = req.user?.isAdmin;
+  const userIsAuthor = req.user?._id === req.params.userid;
+  if (!(userIsAdmin || userIsAuthor)) filter.isPublished = true;
+
+  /** Get posts from db */
+  const posts = await req.context.models.Post.find(filter)
+    .limit(limit)
+    .skip(skip);
+
   return res.json(posts);
 }
