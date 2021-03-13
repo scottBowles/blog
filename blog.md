@@ -1,6 +1,7 @@
 TODO
-Manage authorizations with unpublished posts
-use a /me route to better manage logged in user
+provide a /posts/:postid/publish route
+provide a publish instance method on the post schema
+postDelete doesn't look to account for !req.user -- check this and other routes
 
 ROUTES
 

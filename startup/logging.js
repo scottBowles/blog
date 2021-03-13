@@ -13,7 +13,7 @@ export default function () {
   });
 
   winston.add(
-    new winston.transports.File({ filename: '../logfile.log', level: 'error' })
+    new winston.transports.File({ filename: 'logfile.log', level: 'error' })
   );
 
   // winston.add(
