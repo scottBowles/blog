@@ -75,11 +75,30 @@ export async function postPublish(req, res, next) {
   const post = await req.context.models.Post.findById(req.params.postid);
   if (!post) return res.status(404).json('Post not found');
 
+  /** Ensure user is either author or admin */
   const isUsersPost = post.user.toString() === req.user?._id;
   if (!isUsersPost && !req.user?.isAdmin)
     return res.status(403).json('User not authorized to publish this post');
 
+  /** Publish post */
   const updatedPost = await post.publish();
+
+  return res.json(updatedPost);
+}
+
+export async function postUnpublish(req, res, next) {
+  /** Get post from db */
+  const post = await req.context.models.Post.findById(req.params.postid);
+  if (!post) return res.status(404).json('Post not found');
+
+  /** Ensure user is either author or admin */
+  const isUsersPost = post.user.toString() === req.user?._id;
+  if (!isUsersPost && !req.user?.isAdmin)
+    return res.status(403).json('User not authorized to unpublish this post');
+
+  /** Unpublish post */
+  const updatedPost = await post.unpublish();
+
   return res.json(updatedPost);
 }
 

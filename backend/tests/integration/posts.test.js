@@ -511,10 +511,10 @@ describe('/posts', () => {
       expect(res.status).toBe(400);
     });
 
-    it(`should return 403 if no logged in user`, async () => {
+    it(`should return 401 if no logged in user`, async () => {
       token = '';
       const res = await exec();
-      expect(res.status).toBe(403);
+      expect(res.status).toBe(401);
     });
 
     it(`should return 403 if user is neither author nor admin`, async () => {
@@ -549,9 +549,77 @@ describe('/posts', () => {
     });
   });
 
-  // describe('POST /:postid/unpublish', () => {
+  describe('POST /:postid/unpublish', () => {
+    let postid;
+    let userid;
+    let token;
+    let postPayload;
 
-  // })
+    const exec = async () => {
+      await Post.create(postPayload);
+
+      return request(server)
+        .post(`/posts/${postid}/unpublish`)
+        .set('x-auth-token', token);
+    };
+
+    beforeEach(async () => {
+      postid = mongoose.Types.ObjectId();
+      userid = mongoose.Types.ObjectId();
+      postPayload = {
+        _id: postid,
+        title: 't',
+        text: 't',
+        isPublished: true,
+        user: userid,
+      };
+
+      token = new User({ _id: userid }).generateAuthToken();
+    });
+
+    it(`should return 400 if postid is not valid objectId`, async () => {
+      postid = '1234';
+      const res = await exec();
+      expect(res.status).toBe(400);
+    });
+
+    it(`should return 401 if no logged in user`, async () => {
+      token = '';
+      const res = await exec();
+      expect(res.status).toBe(401);
+    });
+
+    it(`should return 403 if user is neither author nor admin`, async () => {
+      token = new User().generateAuthToken();
+      const res = await exec();
+      expect(res.status).toBe(403);
+    });
+
+    it(`should return 404 if post not found`, async () => {
+      postid = mongoose.Types.ObjectId();
+      const res = await exec();
+      expect(res.status).toBe(404);
+    });
+
+    it(`should unpublish the post if user is admin`, async () => {
+      token = new User({ isAdmin: true }).generateAuthToken();
+      const res = await exec();
+      const updatedPost = await Post.findById(postid);
+      expect(res.status).toBe(200);
+      expect(res.body._id).toBe(postid.toHexString());
+      expect(res.body.isPublished).toBe(false);
+      expect(updatedPost.isPublished).toBe(false);
+    });
+
+    it(`should unpublish the post if user is author`, async () => {
+      const res = await exec();
+      const updatedPost = await Post.findById(postid);
+      expect(res.status).toBe(200);
+      expect(res.body._id).toBe(postid.toHexString());
+      expect(res.body.isPublished).toBe(false);
+      expect(updatedPost.isPublished).toBe(false);
+    });
+  });
 
   describe(`GET /:postid/comments`, () => {
     let postid;

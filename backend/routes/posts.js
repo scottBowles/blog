@@ -38,7 +38,14 @@ router.delete(
 router.post(
   '/:postid/publish',
   validateObjectId('postid'),
+  protectedRoute,
   postController.postPublish
+);
+router.post(
+  '/:postid/unpublish',
+  validateObjectId('postid'),
+  protectedRoute,
+  postController.postUnpublish
 );
 
 router.get(
