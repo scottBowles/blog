@@ -477,6 +477,82 @@ describe('/posts', () => {
     });
   });
 
+  describe('POST /:postid/publish', () => {
+    let postid;
+    let userid;
+    let token;
+    let postPayload;
+
+    const exec = async () => {
+      await Post.create(postPayload);
+
+      return request(server)
+        .post(`/posts/${postid}/publish`)
+        .set('x-auth-token', token);
+    };
+
+    beforeEach(async () => {
+      postid = mongoose.Types.ObjectId();
+      userid = mongoose.Types.ObjectId();
+      postPayload = {
+        _id: postid,
+        title: 't',
+        text: 't',
+        isPublished: false,
+        user: userid,
+      };
+
+      token = new User({ _id: userid }).generateAuthToken();
+    });
+
+    it(`should return 400 if postid is not valid objectId`, async () => {
+      postid = '1234';
+      const res = await exec();
+      expect(res.status).toBe(400);
+    });
+
+    it(`should return 403 if no logged in user`, async () => {
+      token = '';
+      const res = await exec();
+      expect(res.status).toBe(403);
+    });
+
+    it(`should return 403 if user is neither author nor admin`, async () => {
+      token = new User().generateAuthToken();
+      const res = await exec();
+      expect(res.status).toBe(403);
+    });
+
+    it(`should return 404 if post not found`, async () => {
+      postid = mongoose.Types.ObjectId();
+      const res = await exec();
+      expect(res.status).toBe(404);
+    });
+
+    it(`should publish the post if user is admin`, async () => {
+      token = new User({ isAdmin: true }).generateAuthToken();
+      const res = await exec();
+      const updatedPost = await Post.findById(postid);
+      expect(res.status).toBe(200);
+      expect(res.body._id).toBe(postid.toHexString());
+      expect(res.body.isPublished).toBe(true);
+      expect(updatedPost.isPublished).toBe(true);
+    });
+
+    it(`should publish the post if user is author`, async () => {
+      const res = await exec();
+      const updatedPost = await Post.findById(postid);
+      expect(res.status).toBe(200);
+      expect(res.body._id).toBe(postid.toHexString());
+      expect(res.body.isPublished).toBe(true);
+      expect(updatedPost.isPublished).toBe(true);
+    });
+  });
+
+  // describe('POST /:postid/unpublish', () => {
+
+  // })
+
   describe(`GET /:postid/comments`, () => {
     let postid;
     let userid;

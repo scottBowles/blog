@@ -11,6 +11,16 @@ const PostSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+PostSchema.methods.publish = function () {
+  this.isPublished = true;
+  return this.save();
+};
+
+PostSchema.methods.unpublish = function () {
+  this.isPublished = false;
+  return this.save();
+};
+
 export const Post = mongoose.model('Post', PostSchema);
 
 export function validatePost(post) {

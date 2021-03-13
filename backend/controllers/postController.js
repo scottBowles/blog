@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 export async function postsGet(req, res, next) {
   const limit = Number(req.query.limit);
   const skip = Number(req.query.skip);
@@ -70,6 +68,19 @@ export async function postDelete(req, res, next) {
   if (post) await post.remove();
 
   return res.json(post);
+}
+
+export async function postPublish(req, res, next) {
+  /** Get post from db */
+  const post = await req.context.models.Post.findById(req.params.postid);
+  if (!post) return res.status(404).json('Post not found');
+
+  const isUsersPost = post.user.toString() === req.user?._id;
+  if (!isUsersPost && !req.user?.isAdmin)
+    return res.status(403).json('User not authorized to publish this post');
+
+  const updatedPost = await post.publish();
+  return res.json(updatedPost);
 }
 
 export async function postCommentsGet(req, res, next) {

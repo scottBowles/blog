@@ -35,6 +35,12 @@ router.delete(
   postController.postDelete
 );
 
+router.post(
+  '/:postid/publish',
+  validateObjectId('postid'),
+  postController.postPublish
+);
+
 router.get(
   '/:postid/comments',
   validateObjectId('postid'),
