@@ -73,13 +73,22 @@ export async function postDelete(req, res, next) {
 }
 
 export async function postCommentsGet(req, res, next) {
+  /** Get query strings and convert to numbers */
+  const limit = Number(req.query.limit);
+  const skip = Number(req.query.skip);
+
+  /** Find post and ensure it is published */
   const post = await req.context.models.Post.findById(req.params.postid);
   if (!post?.isPublished)
     return res.status(403).json('Cannot access comments on unpublished posts');
 
+  /** Get comments from db, applying filters from query strings */
   const comments = await req.context.models.Comment.find({
     post: req.params.postid,
-  });
+  })
+    .limit(limit)
+    .skip(skip);
+
   return res.json(comments);
 }
 

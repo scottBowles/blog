@@ -1,4 +1,4 @@
-import mongoose, { mongo } from 'mongoose';
+import mongoose from 'mongoose';
 import 'regenerator-runtime/runtime';
 import request from 'supertest';
 import { Post } from '../../models/post.js';
@@ -59,7 +59,7 @@ describe('/posts', () => {
       expect(res.body.some((p) => p.title === 'post4')).toBeTruthy();
     });
 
-    it(`should return the 'take' number of posts if the take query string is provided`, async () => {
+    it(`should return the 'limit' number of posts if the take query string is provided`, async () => {
       const res = await request(server).get(`/posts?limit=2`);
       expect(res.status).toBe(200);
       expect(res.body.length).toBe(2);
@@ -232,7 +232,7 @@ describe('/posts', () => {
       payload.isPublished = false;
       const res = await exec();
       expect(res.status).toBe(403);
-    })
+    });
   });
 
   describe('PUT /:postid', () => {
@@ -481,6 +481,7 @@ describe('/posts', () => {
     let postid;
     let userid;
     let postPayload;
+    let queryString;
 
     const createPostAndComments = async () => {
       await Post.create(postPayload);
@@ -504,7 +505,8 @@ describe('/posts', () => {
       });
     };
 
-    const exec = () => request(server).get(`/posts/${postid}/comments`);
+    const exec = () =>
+      request(server).get(`/posts/${postid}/comments${queryString}`);
 
     beforeEach(() => {
       postid = mongoose.Types.ObjectId();
@@ -516,6 +518,23 @@ describe('/posts', () => {
         isPublished: true,
         user: userid.toHexString(),
       };
+      queryString = ``;
+    });
+
+    it(`should return the limit number of comments if limit query string is provided`, async () => {
+      queryString = `?limit=2`;
+      await createPostAndComments();
+      const res = await exec();
+      expect(res.status).toBe(200);
+      expect(res.body.length).toBe(2);
+    });
+
+    it(`should skip the skip number of comments if skip query string is provided`, async () => {
+      queryString = `?skip=1`;
+      await createPostAndComments();
+      const res = await exec();
+      expect(res.body.length).toBe(2);
+      expect(res.body[0].text).toBe('comment2Text');
     });
 
     it(`should return 400 if postid is an invalid objectid`, async () => {
@@ -575,7 +594,7 @@ describe('/posts', () => {
       postPayload.isPublished = false;
       const res = await exec();
       expect(res.status).toBe(403);
-    })
+    });
 
     it(`should return 400 if postid is an invalid objectid`, async () => {
       postid = 1234;
