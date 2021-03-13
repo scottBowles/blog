@@ -15,6 +15,10 @@ describe('admin middleware', () => {
     next = jest.fn();
   });
 
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
   it('should return 403 if req.user.isAdmin is false', () => {
     req.user.isAdmin = false;
     admin(req, res, next);

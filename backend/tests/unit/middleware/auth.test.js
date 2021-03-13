@@ -12,6 +12,10 @@ dotenv.config();
  */
 
 describe('auth middleware', () => {
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
   it('should populate req.user with the payload of a valid JWT', () => {
     const user = {
       _id: mongoose.Types.ObjectId().toHexString(),

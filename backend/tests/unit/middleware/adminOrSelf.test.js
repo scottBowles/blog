@@ -17,6 +17,10 @@ describe('admin middleware', () => {
     next = jest.fn();
   });
 
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
   it('should return 403 if user._id does not match params.userid && !req.user.isAdmin', () => {
     req.user._id = mongoose.Types.ObjectId();
     req.user.isAdmin = false;
