@@ -87,10 +87,10 @@ Get all users
 
 #### _Parameters_
 
-| Query String Parameter | Description                                                            | Type   |
-| ---------------------- | ---------------------------------------------------------------------- | ------ |
-| limit                  | Response will return at most the limit number of users                 | number |
-| skip                   | Query will skip the provided number of users (ordered by registration) | number |
+| Query String | Description                                                            | Type   |
+| ------------ | ---------------------------------------------------------------------- | ------ |
+| limit        | Response will return at most the limit number of users                 | number |
+| skip         | Query will skip the provided number of users (ordered by registration) | number |
 
 #### _Returns_
 
@@ -184,9 +184,9 @@ Get information about a specific user
 
 #### _Parameters_
 
-| Path Parameter | Description                                                                                                                                          |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| userid         | The user's unique id. This will be a 16-character-long string. To get the information for the logged in user, `/me` may also be used for convenience |
+| Path   | Description                                                                                                                                          |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| userid | The user's unique id. This will be a 16-character-long string. To get the information for the logged in user, `/me` may also be used for convenience |
 
 #### _Returns_
 
@@ -219,9 +219,9 @@ Update information about a specific user. Logged-in users who are not admins may
 
 #### _Parameters_
 
-| Path Parameter | Description                                                    |
-| -------------- | -------------------------------------------------------------- |
-| userid         | The user's unique id. This will be a 16-character-long string. |
+| Path   | Description                                                    |
+| ------ | -------------------------------------------------------------- |
+| userid | The user's unique id. This will be a 16-character-long string. |
 
 | Request Body | Required / Optional | Description                                            | Type   |
 | ------------ | ------------------- | ------------------------------------------------------ | ------ |
@@ -230,9 +230,9 @@ Update information about a specific user. Logged-in users who are not admins may
 | email        | Optional            | User email. Must be unique and at most 255 characters. | string |
 | password     | Optional            | User password. Must be between 8 and 255 characters.   | string |
 
-| Header Parameter | Required / Optional | Description                                                                                |
-| ---------------- | ------------------- | ------------------------------------------------------------------------------------------ |
-| x-auth-token     | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
+| Header       | Required / Optional | Description                                                                                |
+| ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
+| x-auth-token | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
 
 #### _Returns_
 
@@ -267,13 +267,13 @@ Remove a user. Logged-in users who are not admins may remove their own informati
 
 #### _Parameters_
 
-| Path Parameter | Description                                                    |
-| -------------- | -------------------------------------------------------------- |
-| userid         | The user's unique id. This will be a 16-character-long string. |
+| Path   | Description                                                    |
+| ------ | -------------------------------------------------------------- |
+| userid | The user's unique id. This will be a 16-character-long string. |
 
-| Header Parameter | Required / Optional | Description                                                                                                                                             |
-| ---------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| x-auth-token     | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint. Token must be for either an admin or the user being deleted |
+| Header       | Required / Optional | Description                                                                                                                                             |
+| ------------ | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| x-auth-token | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint. Token must be for either an admin or the user being deleted |
 
 #### _Returns_
 
@@ -306,18 +306,18 @@ Get a specific user's posts. Non-admins will receive only published posts, unles
 
 #### _Parameters_
 
-| Path Parameter | Description                                                    |
-| -------------- | -------------------------------------------------------------- |
-| userid         | The user's unique id. This will be a 16-character-long string. |
+| Path   | Description                                                    |
+| ------ | -------------------------------------------------------------- |
+| userid | The user's unique id. This will be a 16-character-long string. |
 
-| Query String Parameter | Description                                                                | Type   |
-| ---------------------- | -------------------------------------------------------------------------- | ------ |
-| limit                  | Response will return at most the limit number of posts                     | number |
-| skip                   | Query will skip the provided number of posts (ordered by date of creation) | number |
+| Query String | Description                                                                | Type   |
+| ------------ | -------------------------------------------------------------------------- | ------ |
+| limit        | Response will return at most the limit number of posts                     | number |
+| skip         | Query will skip the provided number of posts (ordered by date of creation) | number |
 
-| Header Parameter | Required / Optional | Description                                                                                |
-| ---------------- | ------------------- | ------------------------------------------------------------------------------------------ |
-| x-auth-token     | Optional            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
+| Header       | Required / Optional | Description                                                                                |
+| ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
+| x-auth-token | Optional            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
 
 #### _Returns_
 
@@ -406,15 +406,15 @@ Get all posts. By default this will only return published posts.
 
 #### _Parameters_
 
-| Query String Parameter | Description                                                                | Type    |
-| ---------------------- | -------------------------------------------------------------------------- | ------- |
-| limit                  | Response will return at most the limit number of posts                     | number  |
-| skip                   | Query will skip the provided number of posts (ordered by date of creation) | number  |
-| includeunpublished     | Includes unpublished posts if and only if logged-in user is an admin       | boolean |
+| Query String       | Description                                                                | Type    |
+| ------------------ | -------------------------------------------------------------------------- | ------- |
+| limit              | Response will return at most the limit number of posts                     | number  |
+| skip               | Query will skip the provided number of posts (ordered by date of creation) | number  |
+| includeunpublished | Includes unpublished posts if and only if logged-in user is an admin       | boolean |
 
-| Header Parameter | Required / Optional | Description                                                                                |
-| ---------------- | ------------------- | ------------------------------------------------------------------------------------------ |
-| x-auth-token     | Optional            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
+| Header       | Required / Optional | Description                                                                                |
+| ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
+| x-auth-token | Optional            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
 
 <h3 id="post-/posts">POST /posts</h3>
 
@@ -429,9 +429,9 @@ Create a new post. Requires a logged-in user, which will in turn be saved as the
 | isPublished  | Optional            | When false, post will only be visible to admins and the post's own user.            | boolean |
 | (user)       | (n/a)               | (user set to the logged-in user and needs not be otherwise included in the request) | (n/a)   |
 
-| Header Parameter | Required / Optional | Description                                                                                |
-| ---------------- | ------------------- | ------------------------------------------------------------------------------------------ |
-| x-auth-token     | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
+| Header       | Required / Optional | Description                                                                                |
+| ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
+| x-auth-token | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
 
 <h3 id="get-/posts/{postid}">GET /posts/{postid}</h3>
 
@@ -439,13 +439,13 @@ Gets a single post. If the post is unpublished, it will only be accessible to ad
 
 #### _Parameters_
 
-| Path Parameter | Description                                                    |
-| -------------- | -------------------------------------------------------------- |
-| postid         | The post's unique id. This will be a 16-character-long string. |
+| Path   | Description                                                    |
+| ------ | -------------------------------------------------------------- |
+| postid | The post's unique id. This will be a 16-character-long string. |
 
-| Header Parameter | Required / Optional | Description                                                                                |
-| ---------------- | ------------------- | ------------------------------------------------------------------------------------------ |
-| x-auth-token     | Optional            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
+| Header       | Required / Optional | Description                                                                                |
+| ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
+| x-auth-token | Optional            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
 
 <h3 id="put-/posts/{postid}">PUT /posts/{postid}</h3>
 
@@ -453,9 +453,9 @@ Updates a single post. Only accessible to admins and the post's user.
 
 #### _Parameters_
 
-| Path Parameter | Description                                                    |
-| -------------- | -------------------------------------------------------------- |
-| postid         | The post's unique id. This will be a 16-character-long string. |
+| Path   | Description                                                    |
+| ------ | -------------------------------------------------------------- |
+| postid | The post's unique id. This will be a 16-character-long string. |
 
 | Request Body | Required / Optional | Description                                                                                                                                                                                                                                                               | Type    |
 | ------------ | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
@@ -464,9 +464,9 @@ Updates a single post. Only accessible to admins and the post's user.
 | isPublished  | Optional            | When false, post will only be visible to admins and the post's own user. To change only this property, [`/posts/{postid}/publish`](#post-/posts/{postid}/publish) and [`/posts/{postid}/unpublish`](#post-/posts/{postid}/unpublish) routes are included for convenience. | boolean |
 | (user)       | (n/a)               | (Post user cannot be changed. If it is included in the body it will be ignored.)                                                                                                                                                                                          | (n/a)   |
 
-| Header Parameter | Required / Optional | Description                                                                                |
-| ---------------- | ------------------- | ------------------------------------------------------------------------------------------ |
-| x-auth-token     | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
+| Header       | Required / Optional | Description                                                                                |
+| ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
+| x-auth-token | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
 
 <h3 id="delete-/posts/{postid}">DELETE /posts/{postid}</h3>
 
@@ -474,13 +474,13 @@ Remove a user. Logged-in users may remove their own account only. Admins may rem
 
 #### _Parameters_
 
-| Path Parameter | Description                                                    |
-| -------------- | -------------------------------------------------------------- |
-| postid         | The post's unique id. This will be a 16-character-long string. |
+| Path   | Description                                                    |
+| ------ | -------------------------------------------------------------- |
+| postid | The post's unique id. This will be a 16-character-long string. |
 
-| Header Parameter | Required / Optional | Description                                                                                |
-| ---------------- | ------------------- | ------------------------------------------------------------------------------------------ |
-| x-auth-token     | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
+| Header       | Required / Optional | Description                                                                                |
+| ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
+| x-auth-token | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
 
 <h3 id="post-/posts/{postid}/publish">POST /posts/{postid}/publish</h3>
 
@@ -488,13 +488,13 @@ Sets the isPublished attribute for the given post to `true`. Posts may be publis
 
 #### _Parameters_
 
-| Path Parameter | Description                                                    |
-| -------------- | -------------------------------------------------------------- |
-| postid         | The post's unique id. This will be a 16-character-long string. |
+| Path   | Description                                                    |
+| ------ | -------------------------------------------------------------- |
+| postid | The post's unique id. This will be a 16-character-long string. |
 
-| Header Parameter | Required / Optional | Description                                                                                |
-| ---------------- | ------------------- | ------------------------------------------------------------------------------------------ |
-| x-auth-token     | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
+| Header       | Required / Optional | Description                                                                                |
+| ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
+| x-auth-token | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
 
 <h3 id="post-/posts/{postid}/unpublish">POST /posts/{postid}/unpublish</h3>
 
@@ -502,13 +502,13 @@ Sets the isPublished attribute for the given post to `false`. Posts may be unpub
 
 #### _Parameters_
 
-| Path Parameter | Description                                                    |
-| -------------- | -------------------------------------------------------------- |
-| postid         | The post's unique id. This will be a 16-character-long string. |
+| Path   | Description                                                    |
+| ------ | -------------------------------------------------------------- |
+| postid | The post's unique id. This will be a 16-character-long string. |
 
-| Header Parameter | Required / Optional | Description                                                                                |
-| ---------------- | ------------------- | ------------------------------------------------------------------------------------------ |
-| x-auth-token     | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
+| Header       | Required / Optional | Description                                                                                |
+| ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
+| x-auth-token | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
 
 <h3 id="get-/posts/{postid}/comments">GET /posts/{postid}/comments</h3>
 
@@ -516,14 +516,14 @@ Get the comments for the given post. Comments may only be retrieved for publishe
 
 #### _Parameters_
 
-| Path Parameter | Description                                                    |
-| -------------- | -------------------------------------------------------------- |
-| postid         | The post's unique id. This will be a 16-character-long string. |
+| Path   | Description                                                    |
+| ------ | -------------------------------------------------------------- |
+| postid | The post's unique id. This will be a 16-character-long string. |
 
-| Query String Parameter | Description                                                                   | Type   |
-| ---------------------- | ----------------------------------------------------------------------------- | ------ |
-| limit                  | Response will return at most the limit number of comments                     | number |
-| skip                   | Query will skip the provided number of comments (ordered by date of creation) | number |
+| Query String | Description                                                                   | Type   |
+| ------------ | ----------------------------------------------------------------------------- | ------ |
+| limit        | Response will return at most the limit number of comments                     | number |
+| skip         | Query will skip the provided number of comments (ordered by date of creation) | number |
 
 <h3 id="post-/posts/{postid}/comments">POST /posts/{postid}/comments</h3>
 
@@ -531,16 +531,16 @@ Create a new comment for the given post. Comments may only be created for publis
 
 #### _Parameters_
 
-| Path Parameter | Description                                                    |
-| -------------- | -------------------------------------------------------------- |
-| postid         | The post's unique id. This will be a 16-character-long string. |
+| Path   | Description                                                    |
+| ------ | -------------------------------------------------------------- |
+| postid | The post's unique id. This will be a 16-character-long string. |
 
-| Request Body | Required / Optional | Description                                                           | Type    |
-| ------------ | ------------------- | --------------------------------------------------------------------- | ------- |
-| text         | Required            | Comment text.                                                         | string  |
-| author       | Required            | Comment author - a name or handle for display.                        | string  |
-| email        | Optional            | An email address for the comment's author.                            | boolean |
-| (post)       | (n/a)               | (post will be set to the post retrieved by the postid path parameter) | n/a     |
+| Request Body | Required / Optional | Description                                                 | Type    |
+| ------------ | ------------------- | ----------------------------------------------------------- | ------- |
+| text         | Required            | Comment text.                                               | string  |
+| author       | Required            | Comment author - a name or handle for display.              | string  |
+| email        | Optional            | An email address for the comment's author.                  | boolean |
+| (post)       | (n/a)               | (post will be set to the post retrieved by the postid Path) | n/a     |
 
 <h3 id="get-/posts/{postid}/comments/{commentid}">GET /posts/{postid}/comments/{commentid}</h3>
 
@@ -548,10 +548,10 @@ Get a single comment.
 
 #### _Parameters_
 
-| Path Parameter | Description                                                       |
-| -------------- | ----------------------------------------------------------------- |
-| postid         | The post's unique id. This will be a 16-character-long string.    |
-| commentid      | The comment's unique id. This will be a 16-character-long string. |
+| Path      | Description                                                       |
+| --------- | ----------------------------------------------------------------- |
+| postid    | The post's unique id. This will be a 16-character-long string.    |
+| commentid | The comment's unique id. This will be a 16-character-long string. |
 
 <h3 id="put-/posts/{postid}/comments/{commentid}">PUT /posts/{postid}/comments/{commentid}</h3>
 
@@ -559,10 +559,10 @@ Update a single comment. Only accessible for admins.
 
 #### _Parameters_
 
-| Path Parameter | Description                                                       |
-| -------------- | ----------------------------------------------------------------- |
-| postid         | The post's unique id. This will be a 16-character-long string.    |
-| commentid      | The comment's unique id. This will be a 16-character-long string. |
+| Path      | Description                                                       |
+| --------- | ----------------------------------------------------------------- |
+| postid    | The post's unique id. This will be a 16-character-long string.    |
+| commentid | The comment's unique id. This will be a 16-character-long string. |
 
 | Request Body | Required / Optional | Description                                                             | Type    |
 | ------------ | ------------------- | ----------------------------------------------------------------------- | ------- |
@@ -571,9 +571,9 @@ Update a single comment. Only accessible for admins.
 | email        | Optional            | An email address for the comment's author.                              | boolean |
 | (post)       | (n/a)               | (post will be set to the comment's original post and cannot be changed) | n/a     |
 
-| Header Parameter | Required / Optional | Description                                                                                |
-| ---------------- | ------------------- | ------------------------------------------------------------------------------------------ |
-| x-auth-token     | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
+| Header       | Required / Optional | Description                                                                                |
+| ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
+| x-auth-token | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
 
 <h3 id="delete-/posts/{postid}/comments/{commentid}">DELETE /posts/{postid}/comments/{commentid}</h3>
 
@@ -581,14 +581,14 @@ Removes a comment. Logged in users may remove comments on their own posts. Admin
 
 #### _Parameters_
 
-| Path Parameter | Description                                                       |
-| -------------- | ----------------------------------------------------------------- |
-| postid         | The post's unique id. This will be a 16-character-long string.    |
-| commentid      | The comment's unique id. This will be a 16-character-long string. |
+| Path      | Description                                                       |
+| --------- | ----------------------------------------------------------------- |
+| postid    | The post's unique id. This will be a 16-character-long string.    |
+| commentid | The comment's unique id. This will be a 16-character-long string. |
 
-| Header Parameter | Required / Optional | Description                                                                                |
-| ---------------- | ------------------- | ------------------------------------------------------------------------------------------ |
-| x-auth-token     | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
+| Header       | Required / Optional | Description                                                                                |
+| ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
+| x-auth-token | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
 
 <h3 id="get-/me">GET /me</h3>
 
@@ -596,9 +596,9 @@ Get the logged in user's information.
 
 #### _Parameters_
 
-| Header Parameter | Required / Optional | Description                                                                                |
-| ---------------- | ------------------- | ------------------------------------------------------------------------------------------ |
-| x-auth-token     | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
+| Header       | Required / Optional | Description                                                                                |
+| ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
+| x-auth-token | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
 
 <h3 id="post-/login">POST /login</h3>
 
