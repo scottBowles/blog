@@ -8,7 +8,7 @@
 
 <h2 id="resources">Resources</h2>
 
-### Users
+<h3 id="users">Users</h3>
 
 | Attribute | Constraints                                     | Description                                                       | Type    |
 | --------- | ----------------------------------------------- | ----------------------------------------------------------------- | ------- |
@@ -18,7 +18,7 @@
 | password  | required; minimum 8 char; maximum 255 char      | User password                                                     | string  |
 | isAdmin   | optional                                        | Defaults to false. Determines whether user has admin permissions. | boolean |
 
-### Posts
+<h3 id="posts">Posts</h3>
 
 | Attribute   | Constraints                                | Description                                                                                                                                                                  | Type    |
 | ----------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
@@ -27,7 +27,7 @@
 | isPublished | optional; valid email; maximum 255 char    | Defaults to false. When isPublished is false, the post will only be return in requests made by the post's user and admin users. See below for details on specific endpoints. | boolean |
 | user        | required; unique; 16 char objectID         | User password                                                                                                                                                                | string  |
 
-### Comments
+<h3 id="comments">Comments</h3>
 
 | Attribute | Constraints                                | Description                       | Type   |
 | --------- | ------------------------------------------ | --------------------------------- | ------ |
@@ -92,6 +92,48 @@ Get all users
 | limit                  | Response will return at most the limit number of users                 | number |
 | skip                   | Query will skip the provided number of users (ordered by registration) | number |
 
+#### _Returns_
+
+An array of [users](#users)
+
+#### _Example Request_
+
+curl --location --request GET 'http://localhost:3000/users'
+
+#### _Example Response_
+
+```json
+[
+  {
+    "_id": "604d8dc8a9c87361f984d130",
+    "firstName": "Malcolm",
+    "lastName": "Reynolds",
+    "email": "captaintightpants@gmail.com",
+    "__v": 0,
+    "fullName": "Malcolm Reynolds",
+    "id": "604d8dc8a9c87361f984d130"
+  },
+  {
+    "_id": "604d8e23a9c87361f984d131",
+    "firstName": "Inara",
+    "lastName": "Serra",
+    "email": "iserra@gmail.com",
+    "__v": 0,
+    "fullName": "Inara Serra",
+    "id": "604d8e23a9c87361f984d131"
+  },
+  {
+    "_id": "604d8e60a9c87361f984d132",
+    "firstName": "Zoe",
+    "lastName": "Washburn",
+    "email": "zoe@gmail.com",
+    "__v": 0,
+    "fullName": "Zoe Washburne",
+    "id": "604d8e60a9c87361f984d132"
+  }
+]
+```
+
 <h3 id="post-/users">POST /users</h3>
 
 Register a new user
@@ -105,6 +147,33 @@ Register a new user
 | email        | Required            | User email. Must be unique and at most 255 characters. | string |
 | password     | Required            | User password. Must be between 8 and 255 characters.   | string |
 
+#### _Returns_
+
+The newly registered [user](#users) with password omitted
+
+#### _Example Request_
+
+curl --location --request POST 'http://localhost:3000/users/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+"firstName": "Hoban",
+"lastName": "Washburne",
+"email": "wash@gmail.com",
+"password": "washPassword"
+}'
+
+#### _Example Response_
+
+```json
+{
+  "_id": "604d902aa9c87361f984d134",
+  "firstName": "Hoban",
+  "lastName": "Washburne",
+  "email": "wash@gmail.com",
+  "fullName": "Hoban Washburne"
+}
+```
+
 <h3 id="get-/users/{userid}">GET /users/{userid}</h3>
 
 Get information about a specific user
@@ -114,6 +183,29 @@ Get information about a specific user
 | Path Parameter | Description                                                                                                                                          |
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | userid         | The user's unique id. This will be a 16-character-long string. To get the information for the logged in user, `/me` may also be used for convenience |
+
+#### _Returns_
+
+The requested [user](#users)
+
+#### _Example Request_
+
+curl --location --request GET 'http://localhost:3000/users/604d8dc8a9c87361f984d130'
+
+#### _Example Response_
+
+```json
+{
+  "_id": "604d8dc8a9c87361f984d130",
+  "firstName": "Malcolm",
+  "lastName": "Reynolds",
+  "email": "captaintightpants@gmail.com",
+  "isAdmin": true,
+  "__v": 0,
+  "fullName": "Malcolm Reynolds",
+  "id": "604d8dc8a9c87361f984d130"
+}
+```
 
 <h3 id="put-/users/{userid}">PUT /users/{userid}</h3>
 
