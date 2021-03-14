@@ -3,8 +3,8 @@ import * as postController from '../controllers/postController.js';
 import protectedRoute from '../middleware/protectedRoute.js';
 import admin from '../middleware/admin.js';
 import validate from '../middleware/validate.js';
-import validateObjectId from '../middleware/validateObjectId';
-import { validatePost } from '../models/post';
+import validateObjectId from '../middleware/validateObjectId.js';
+import { validatePost } from '../models/post.js';
 import { validateComment } from '../models/comment.js';
 
 const router = express.Router();
