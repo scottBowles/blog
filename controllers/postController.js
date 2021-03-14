@@ -2,7 +2,7 @@ export async function postsGet(req, res, next) {
   const limit = Number(req.query.limit);
   const skip = Number(req.query.skip);
   const includeunpublished =
-    req.user?.isAdmin && req.query.includeunpublished.toLowerCase() === 'true';
+    req.user?.isAdmin && req.query.includeunpublished?.toLowerCase() === 'true';
   const filter = includeunpublished ? {} : { isPublished: true };
   const posts = await req.context.models.Post.find(filter)
     .skip(skip)
@@ -17,7 +17,7 @@ export async function postsPost(req, res, next) {
     title,
     text,
     isPublished,
-    user: req.user._id,
+    user: req.user.isAdmin && req.body.user ? req.body.user : req.user._id,
   });
 
   return res.json(post);
