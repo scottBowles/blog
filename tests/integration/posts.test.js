@@ -141,10 +141,26 @@ describe('/posts', () => {
       expect(res.status).toBe(400);
     });
 
-    it('should not use user if provided (should use logged in user instead)', async () => {
+    it('should not use user if provided in body if current user is not an admin (should use logged in user instead)', async () => {
       payload.user = new mongoose.Types.ObjectId();
       const res = await exec();
       expect(res.body.user).not.toBe(payload.user);
+    });
+
+    it('should use user in body if user is an admin', async () => {
+      const userPayload = { _id: mongoose.Types.ObjectId(), isAdmin: true };
+      token = new User(userPayload).generateAuthToken();
+      payload.user = new mongoose.Types.ObjectId();
+      const res = await exec();
+      expect(res.body.user).toBe(payload.user.toHexString());
+      expect(res.body.user).not.toBe(userPayload._id.toHexString());
+    });
+
+    it('should use current user if user is an admin and req.body.user is not defined', async () => {
+      const userPayload = { _id: mongoose.Types.ObjectId(), isAdmin: true };
+      token = new User(userPayload).generateAuthToken();
+      const res = await exec();
+      expect(res.body.user).toBe(userPayload._id.toHexString());
     });
 
     it('should save the post if it is valid', async () => {

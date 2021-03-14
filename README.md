@@ -98,7 +98,9 @@ An array of [users](#users)
 
 #### _Example Request_
 
+```bash
 curl --location --request GET 'http://localhost:3000/users'
+```
 
 #### _Example Response_
 
@@ -153,6 +155,7 @@ The newly registered [user](#users) with password omitted
 
 #### _Example Request_
 
+```bash
 curl --location --request POST 'http://localhost:3000/users/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -161,6 +164,7 @@ curl --location --request POST 'http://localhost:3000/users/' \
 "email": "wash@gmail.com",
 "password": "washPassword"
 }'
+```
 
 #### _Example Response_
 
@@ -190,7 +194,9 @@ The requested [user](#users)
 
 #### _Example Request_
 
+```bash
 curl --location --request GET 'http://localhost:3000/users/604d8dc8a9c87361f984d130'
+```
 
 #### _Example Response_
 
@@ -315,7 +321,7 @@ Get a specific user's posts. Non-admins will receive only published posts, unles
 
 #### _Returns_
 
-The deleted [user](#users)
+The [user's](#users) [posts](#posts). Returns all posts for admins and logged in users querying their own [posts](#posts). Returns only published posts for everyone else.
 
 #### _Example Request 1_ (no logged in user)
 
