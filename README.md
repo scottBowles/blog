@@ -108,7 +108,7 @@ curl --location --request GET 'http://localhost:3000/users'
     "_id": "604d8dc8a9c87361f984d130",
     "firstName": "Malcolm",
     "lastName": "Reynolds",
-    "email": "captaintightpants@gmail.com",
+    "email": "mal@gmail.com",
     "__v": 0,
     "fullName": "Malcolm Reynolds",
     "id": "604d8dc8a9c87361f984d130"
@@ -125,7 +125,7 @@ curl --location --request GET 'http://localhost:3000/users'
   {
     "_id": "604d8e60a9c87361f984d132",
     "firstName": "Zoe",
-    "lastName": "Washburn",
+    "lastName": "Washburne",
     "email": "zoe@gmail.com",
     "__v": 0,
     "fullName": "Zoe Washburne",
@@ -199,7 +199,7 @@ curl --location --request GET 'http://localhost:3000/users/604d8dc8a9c87361f984d
   "_id": "604d8dc8a9c87361f984d130",
   "firstName": "Malcolm",
   "lastName": "Reynolds",
-  "email": "captaintightpants@gmail.com",
+  "email": "mal@gmail.com",
   "isAdmin": true,
   "__v": 0,
   "fullName": "Malcolm Reynolds",
@@ -219,14 +219,41 @@ Update information about a specific user. Logged-in users who are not admins may
 
 | Request Body | Required / Optional | Description                                            | Type   |
 | ------------ | ------------------- | ------------------------------------------------------ | ------ |
-| firstName    | Required            | User first name. Must be between 1 and 255 characters. | string |
-| lastName     | Required            | User last name. Must be between 1 and 255 characters.  | string |
-| email        | Required            | User email. Must be unique and at most 255 characters. | string |
-| password     | Required            | User password. Must be between 8 and 255 characters.   | string |
+| firstName    | Optional            | User first name. Must be between 1 and 255 characters. | string |
+| lastName     | Optional            | User last name. Must be between 1 and 255 characters.  | string |
+| email        | Optional            | User email. Must be unique and at most 255 characters. | string |
+| password     | Optional            | User password. Must be between 8 and 255 characters.   | string |
 
 | Header Parameter | Required / Optional | Description                                                                                |
 | ---------------- | ------------------- | ------------------------------------------------------------------------------------------ |
 | x-auth-token     | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
+
+#### _Returns_
+
+The updated [user](#users)
+
+#### _Example Request_
+
+```bash
+curl --location --request PUT 'http://localhost:3000/users/604d8dc8a9c87361f984d130' \
+--header 'x-auth-token: {jsonwebtoken from registration or login}' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+"email": "captaintightpants@gmail.com"
+}'
+```
+
+#### _Example Response_
+
+```json
+{
+  "_id": "604d8dc8a9c87361f984d130",
+  "firstName": "Malcolm",
+  "lastName": "Reynolds",
+  "email": "captaintightpants@gmail.com",
+  "fullName": "Malcolm Reynolds"
+}
+```
 
 <h3 id="delete-/users/{userid}">DELETE /users/{userid}</h3>
 
@@ -238,9 +265,34 @@ Remove a user. Logged-in users who are not admins may remove their own informati
 | -------------- | -------------------------------------------------------------- |
 | userid         | The user's unique id. This will be a 16-character-long string. |
 
-| Header Parameter | Required / Optional | Description                                                                                |
-| ---------------- | ------------------- | ------------------------------------------------------------------------------------------ |
-| x-auth-token     | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
+| Header Parameter | Required / Optional | Description                                                                                                                                             |
+| ---------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| x-auth-token     | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint. Token must be for either an admin or the user being deleted |
+
+#### _Returns_
+
+The deleted [user](#users)
+
+#### _Example Request_
+
+```bash
+curl --location --request DELETE 'http://localhost:3000/users/604d902aa9c87361f984d134' \
+--header 'x-auth-token: {jsonwebtoken}'
+```
+
+#### _Example Response_
+
+```json
+{
+  "_id": "604d902aa9c87361f984d134",
+  "firstName": "Hoban",
+  "lastName": "Washburne",
+  "email": "wash@gmail.com",
+  "__v": 0,
+  "fullName": "Hoban Washburne",
+  "id": "604d902aa9c87361f984d134"
+}
+```
 
 <h3 id="get-/users/{userid}/posts">GET /users/{userid}/posts</h3>
 
@@ -260,6 +312,87 @@ Get a specific user's posts. Non-admins will receive only published posts, unles
 | Header Parameter | Required / Optional | Description                                                                                |
 | ---------------- | ------------------- | ------------------------------------------------------------------------------------------ |
 | x-auth-token     | Optional            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
+
+#### _Returns_
+
+The deleted [user](#users)
+
+#### _Example Request 1_ (no logged in user)
+
+```bash
+curl --location --request GET 'http://localhost:3000/users/604e5d8458d0b87135a69402/posts'
+```
+
+#### _Example Response 1_
+
+```json
+[
+  {
+    "isPublished": true,
+    "_id": "604e634248484473c282b1dd",
+    "title": "Terrifying Space Monkeys?",
+    "text": "Look, I had to rewire the grav thrust because somebody won't replace that crappy compression coil.",
+    "user": "604e5d8458d0b87135a69402",
+    "createdAt": "2021-03-14T19:25:54.716Z",
+    "updatedAt": "2021-03-14T19:25:54.716Z",
+    "__v": 0
+  },
+  {
+    "isPublished": true,
+    "_id": "604e645948484473c282b1df",
+    "title": "Buffet Table?",
+    "text": "Well how can we be sure, unless we question it?",
+    "user": "604e5d8458d0b87135a69402",
+    "createdAt": "2021-03-14T19:30:33.892Z",
+    "updatedAt": "2021-03-14T19:30:33.892Z",
+    "__v": 0
+  }
+]
+```
+
+#### _Example Request 2_ (querying posts of the logged in user)
+
+```bash
+curl --location --request GET 'http://localhost:3000/users/604e5d8458d0b87135a69402/posts' \
+--header 'x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDRlNWQ4NDU4ZDBiODcxMzVhNjk0MDIiLCJpYXQiOjE2MTU3NTA2Njh9.jcRhDO6eMwZYPahxlhRRfkpFVHU8UjT6q4LV50_-Pko'
+```
+
+#### _Example Response 2_
+
+```json
+[
+  {
+    "isPublished": true,
+    "_id": "604e634248484473c282b1dd",
+    "title": "Terrifying Space Monkeys?",
+    "text": "Look, I had to rewire the grav thrust because somebody won't replace that crappy compression coil.",
+    "user": "604e5d8458d0b87135a69402",
+    "createdAt": "2021-03-14T19:25:54.716Z",
+    "updatedAt": "2021-03-14T19:25:54.716Z",
+    "__v": 0
+  },
+  {
+    "isPublished": false,
+    "_id": "604e638648484473c282b1de",
+    "title": "Simon",
+    "text": "How clueless can he be!?",
+    "user": "604e5d8458d0b87135a69402",
+    "createdAt": "2021-03-14T19:27:02.729Z",
+    "updatedAt": "2021-03-14T19:27:02.729Z",
+    "__v": 0
+  },
+  {
+    "isPublished": true,
+    "_id": "604e645948484473c282b1df",
+    "title": "Buffet Table?",
+    "text": "Well how can we be sure, unless we question it?",
+    "user": "604e5d8458d0b87135a69402",
+    "createdAt": "2021-03-14T19:30:33.892Z",
+    "updatedAt": "2021-03-14T19:30:33.892Z",
+    "__v": 0
+  }
+]
+```
 
 <h3 id="get-/posts">GET /posts</h3>
 
