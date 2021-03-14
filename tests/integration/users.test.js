@@ -306,6 +306,19 @@ describe('/users', () => {
       expect(res.body).toHaveProperty('firstName', updatePayload.firstName);
       expect(res.body).not.toHaveProperty('password');
     });
+
+    it(`should work with only a partial payload`, async () => {
+      updatePayload = { email: 'new@email.com' };
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty(
+        'firstName',
+        initialUserPayload.firstName
+      );
+      expect(res.body).toHaveProperty('email', updatePayload.email);
+      expect(res.body).not.toHaveProperty('password');
+    });
   });
 
   describe(`DELETE /:userid`, () => {

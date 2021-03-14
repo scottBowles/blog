@@ -22,3 +22,13 @@ export function validateComment(comment) {
   });
   return schema.validate(comment);
 }
+
+export function validateCommentUpdate(comment) {
+  const schema = Joi.object({
+    text: Joi.string().min(1).max(255),
+    author: Joi.string().min(1).max(255),
+    email: Joi.string().email().max(255),
+    post: Joi.objectId(),
+  });
+  return schema.validate(comment);
+}

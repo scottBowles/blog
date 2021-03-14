@@ -5,7 +5,7 @@ import protectedRoute from '../middleware/protectedRoute.js';
 import adminOrSelf from '../middleware/adminOrSelf.js';
 import validate from '../middleware/validate.js';
 import validateObjectId from '../middleware/validateObjectId.js';
-import { validateUser } from '../models/user.js';
+import { validateUser, validateUserUpdate } from '../models/user.js';
 
 const router = express.Router();
 
@@ -18,7 +18,7 @@ router.put(
   [
     validateObjectId('userid'),
     protectedRoute,
-    validate(validateUser),
+    validate(validateUserUpdate),
     adminOrSelf,
   ],
   userController.userPut

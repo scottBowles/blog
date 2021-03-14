@@ -62,14 +62,18 @@ export async function userPut(req, res, next) {
   if (!user) return res.status(404).json('User not found');
 
   /** Salt and hash password */
-  const salt = await bcrypt.genSalt(10);
-  const hashed = await bcrypt.hash(req.body.password, salt);
+  let salt;
+  let hashed;
+  if (req.body.password) {
+    salt = await bcrypt.genSalt(10);
+    hashed = await bcrypt.hash(req.body.password, salt);
+  }
 
   /** Update user and save */
-  user.firstName = req.body.firstName;
-  user.lastName = req.body.lastName;
-  user.email = req.body.email;
-  user.password = hashed;
+  user.firstName = req.body.firstName || user.firstName;
+  user.lastName = req.body.lastName || user.lastName;
+  user.email = req.body.email || user.email;
+  user.password = hashed || user.password;
   const updatedUser = await user.save();
 
   return res.json(

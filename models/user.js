@@ -37,4 +37,15 @@ export function validateUser(user) {
   return schema.validate(user);
 }
 
-export default { User, validateUser };
+export function validateUserUpdate(user) {
+  const schema = Joi.object({
+    firstName: Joi.string().min(1).max(255),
+    lastName: Joi.string().min(1).max(255),
+    email: Joi.string().email().max(255),
+    password: Joi.string().min(8).max(255),
+    isAdmin: Joi.boolean(),
+  });
+  return schema.validate(user);
+}
+
+export default { User, validateUser, validateUserUpdate };

@@ -403,6 +403,21 @@ describe('/posts', () => {
       expect(res.body).toHaveProperty('isPublished', updatePayload.isPublished);
       expect(res.body).toHaveProperty('user', postPayload.user.toHexString());
     });
+
+    it('should work with a partial payload', async () => {
+      updatePayload = { text: 'newText' };
+      await createUser();
+      await generateToken();
+      await createPost();
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('_id', postid.toHexString());
+      expect(res.body).toHaveProperty('title', postPayload.title);
+      expect(res.body).toHaveProperty('text', updatePayload.text);
+      expect(res.body).toHaveProperty('isPublished', postPayload.isPublished);
+      expect(res.body).toHaveProperty('user', postPayload.user.toHexString());
+    });
   });
 
   describe('DELETE /:postid', () => {
@@ -994,6 +1009,20 @@ describe('/posts', () => {
       expect(comment).toHaveProperty('text', 'updatedText');
       expect(comment).toHaveProperty('author', 'updatedAuthor');
       expect(comment).toHaveProperty('email', 'updated@email.com');
+    });
+
+    it(`should work with partial payload`, async () => {
+      reqPayload = { text: 'updatedText' };
+      await createToken();
+      const res = await exec();
+      const comment = await Comment.findById(commentid);
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('text', reqPayload.text);
+      expect(res.body).toHaveProperty('author', 'testAuthor');
+      expect(res.body).toHaveProperty('email', 'test@email.com');
+      expect(comment).toHaveProperty('text', 'updatedText');
+      expect(comment).toHaveProperty('author', 'testAuthor');
+      expect(comment).toHaveProperty('email', 'test@email.com');
     });
   });
 

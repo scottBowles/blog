@@ -46,9 +46,9 @@ export async function postPut(req, res, next) {
     return res.status(403).json(`Forbidden: Cannot update another user's post`);
 
   /** Update post */
-  post.title = req.body.title;
-  post.text = req.body.text;
-  post.isPublished = req.body.isPublished;
+  post.title = req.body.title || post.title;
+  post.text = req.body.text || post.text;
+  post.isPublished = req.body.isPublished || post.isPublished;
   const updatedPost = await post.save();
 
   return res.json(updatedPost);
@@ -164,9 +164,9 @@ export async function postCommentPut(req, res, next) {
   if (!comment) return res.status(404).json('Comment not found');
 
   /** Update comment */
-  comment.text = req.body.text;
-  comment.author = req.body.author;
-  comment.email = req.body.email;
+  comment.text = req.body.text || comment.text;
+  comment.author = req.body.author || comment.author;
+  comment.email = req.body.email || comment.email;
   const updatedComment = await comment.save();
 
   return res.json(updatedComment);

@@ -5,7 +5,7 @@ import admin from '../middleware/admin.js';
 import validate from '../middleware/validate.js';
 import validateObjectId from '../middleware/validateObjectId.js';
 import { validatePost } from '../models/post.js';
-import { validateComment } from '../models/comment.js';
+import { validateComment, validateCommentUpdate } from '../models/comment.js';
 
 const router = express.Router();
 
@@ -74,7 +74,7 @@ router.put(
   validateObjectId('postid'),
   validateObjectId('commentid'),
   protectedRoute,
-  validate(validateComment, (req) => ({
+  validate(validateCommentUpdate, (req) => ({
     ...req.body,
     post: req.params.postid,
   })),
