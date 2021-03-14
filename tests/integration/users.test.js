@@ -51,13 +51,14 @@ describe('/users', () => {
       ]);
     });
 
-    it('should return all users', async () => {
+    it('should return all users excluding the password field', async () => {
       const res = await exec();
       expect(res.status).toBe(200);
       expect(res.body.length).toBe(3);
       expect(res.body.some((u) => u.email === 'e1@test.com')).toBeTruthy();
       expect(res.body.some((u) => u.email === 'e2@test.com')).toBeTruthy();
       expect(res.body.some((u) => u.email === 'e3@test.com')).toBeTruthy();
+      expect(res.body.some((u) => u.password)).toBeFalsy();
     });
 
     it(`should return limit number of users if limit query string is provided`, async () => {
@@ -75,6 +76,7 @@ describe('/users', () => {
       expect(res.body[0].email).toBe('e2@test.com');
     });
   });
+
   describe('POST /', () => {
     let payload;
 
@@ -213,8 +215,10 @@ describe('/users', () => {
 
     it(`should return the user`, async () => {
       const res = await exec();
+      const { password, ...userWithoutPassword } = existingUser;
       expect(res.status).toBe(200);
-      expect(res.body).toMatchObject(existingUser);
+      expect(res.body).toMatchObject(userWithoutPassword);
+      expect(res.body.password).not.toBeDefined();
     });
   });
 
@@ -347,6 +351,7 @@ describe('/users', () => {
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty('_id', userPayload._id);
       expect(res.body).toHaveProperty('firstName', userPayload.firstName);
+      expect(res.body).not.toHaveProperty('password');
       expect(noLongerExistingUser).toBeFalsy();
     });
 

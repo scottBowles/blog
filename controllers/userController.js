@@ -7,7 +7,10 @@ export async function usersGet(req, res, next) {
   const skip = Number(req.query.skip);
 
   /** Get users from db */
-  const users = await req.context.models.User.find().limit(limit).skip(skip);
+  const users = await req.context.models.User.find()
+    .select('-password')
+    .limit(limit)
+    .skip(skip);
 
   return res.json(users);
 }
@@ -38,7 +41,9 @@ export async function usersPost(req, res, next) {
 }
 
 export async function userGet(req, res, next) {
-  const user = await req.context.models.User.findById(req.params.userid);
+  const user = await req.context.models.User.findById(req.params.userid).select(
+    '-password'
+  );
   if (!user) return res.status(404).json('User not found');
 
   return res.json(user);
@@ -74,7 +79,9 @@ export async function userPut(req, res, next) {
 
 export async function userDelete(req, res, next) {
   /** Get user from db and remove */
-  const user = await req.context.models.User.findById(req.params.userid);
+  const user = await req.context.models.User.findById(req.params.userid).select(
+    '-password'
+  );
   if (user) await user.remove();
 
   return res.json(user);
