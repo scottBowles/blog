@@ -21,6 +21,13 @@ describe('/', () => {
     await server.close();
   });
 
+  describe('GET /', () => {
+    it('should return a 200 response', async () => {
+      const res = await request(server).get('/');
+      expect(res.status).toBe(200);
+    });
+  });
+
   describe('GET /me', () => {
     let userid;
     let token;

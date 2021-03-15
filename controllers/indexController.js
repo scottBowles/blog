@@ -1,5 +1,11 @@
 import bcrypt from 'bcrypt';
 
+export function index(req, res, next) {
+  return res.json(
+    'This is a blog REST api allowing multiple users, admins, posts, and comments. For documentation please see https://github.com/scottBowles/blog.'
+  );
+}
+
 export async function me(req, res, next) {
   /** Get user from db, excluding password */
   const user = await req.context.models.User.findById(req.user._id).select(

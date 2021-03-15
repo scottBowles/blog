@@ -17,6 +17,7 @@ function validateLogin(user) {
 // What is the index route here? There's no obvious resource
 // router.get('/', (req, res) => {});
 
+router.get('/', indexController.index);
 router.get('/me', protectedRoute, indexController.me);
 router.post('/login', validate(validateLogin), indexController.login);
 

@@ -2,6 +2,7 @@ TODO
 consider doing more with the /me route
 handle user and post deletions -- whether we want to delete user's posts / post's comments
 return a jwt on registration
+put something on the index route
 
 ROUTES
 
