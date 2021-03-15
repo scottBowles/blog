@@ -1,12 +1,65 @@
-# BLOG REST API
+# BLOG API
+
+> A blog REST api allowing multiple users, admins, posts, and comments
+
+[![Coverage](https://img.shields.io/badge/Coverage-100%25-green)](https://github.com/scottBowles/blog/README.md)
+[![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/scottBowles/blog)
 
 ## Table of Contents
 
-1. [Resources](#resources)
+1. [Technology Stack](#techstack)
+1. [Local Installation](#localinstallation)
+1. [API Resources](#resources)
 1. [Endpoints](#endpoints)
 1. [Endpoint Details](#endpointdetails)
 
-<h2 id="resources">Resources</h2>
+<h2 id="techstack">Technology Stack</h2>
+
+[![Node.js](https://img.shields.io/badge/-Node.js-339933?logo=node.js&logoColor=fff)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/-Express-000000?logo=express)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/-MongoDB-153814?logo=mongodb)](https://www.mongodb.org/)
+[![Jest](https://img.shields.io/badge/-Jest-C21325?logo=jest)](https://jestjs.io/)
+[![Babel](https://img.shields.io/badge/-Babel-030301?logo=babel)](https://babeljs.io/)
+[![ESLint](https://img.shields.io/badge/-ESLint-4B32C3?logo=eslint)](https://eslint.org/)
+[![Prettier](https://img.shields.io/badge/-Prettier-24292e?logo=prettier)](https://prettier.io/)
+[![JavaScript](https://img.shields.io/badge/-JavaScript-F7DF1E?logo=javascript&logoColor=000)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![npm](https://img.shields.io/badge/-npm-CB3837?logo=npm)](https://www.npmjs.com/)
+
+<h2 id="localinstallation">Local Installation</h2>
+
+### Requirements
+
+[Node.js](https://nodejs.org/en/) with npm
+[MongoDB](https://www.mongodb.com/cloud/atlas)
+[Git](https://git-scm.com/)
+
+Clone this repository and cd into the folder
+
+```bash
+git clone git@github.com:scottBowles/blog.git
+cd blog
+```
+
+Install dependencies
+
+```bash
+npm i
+```
+
+Create a .env file with environment variables. For this you will need to set up your MongoDB databases (a dev db and a test db) and retrieve the connection URIs. The URIs will look something like this: `mongodb+srv://[username]:[password]@cluster0.g79of.mongodb.net/[database]?retryWrites=true&w=majority`
+
+```
+PORT=3000
+PORT_TEST=5000
+DB_URI={Dev DB Connection URI}
+DB_URI_TEST={Test DB Connection URI}
+JWT_PRIVATE_KEY=aPrivatePasswordDefinedHere
+```
+
+Start the server with `npm start` and access at `http://localhost:3000/`
+Run tests with `npm test`
+
+<h2 id="resources">API Resources</h2>
 
 <h3 id="users">Users</h3>
 
