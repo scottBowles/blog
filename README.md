@@ -29,15 +29,15 @@
 
 ### Requirements
 
-[Node.js](https://nodejs.org/en/) with npm
-[MongoDB](https://www.mongodb.com/cloud/atlas)
-[Git](https://git-scm.com/)
+- [Node.js](https://nodejs.org/en/) with npm
+- [MongoDB](https://www.mongodb.com/cloud/atlas)
+- [Git](https://git-scm.com/)
 
-Clone this repository and cd into the folder
+Clone this repository and change directory into the folder
 
 ```bash
 git clone git@github.com:scottBowles/blog.git
-cd blog
+cd ./blog
 ```
 
 Install dependencies
