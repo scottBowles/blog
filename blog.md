@@ -1,7 +1,7 @@
 TODO
-provide a /posts/:postid/publish route
-provide a publish instance method on the post schema
-postDelete doesn't look to account for !req.user -- check this and other routes
+consider doing more with the /me route
+handle user and post deletions -- whether we want to delete user's posts / post's comments
+return a jwt on registration
 
 ROUTES
 
