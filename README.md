@@ -70,7 +70,7 @@ Available Methods
 | PUT    | [/posts/{postid}/comments/{commentid}](#put-/posts/{postid}/comments/{commentid})    | Update a specific comment           |
 | DELETE | [/posts/{postid}/comments/{commentid}](#delete-/posts/{postid}/comments/{commentid}) | Remove a specific comment           |
 
-### Other Endpoints Offered
+### Other Endpoints
 
 Available Methods
 
@@ -360,7 +360,7 @@ curl --location --request GET 'http://localhost:3000/users/604e5d8458d0b87135a69
 
 ```bash
 curl --location --request GET 'http://localhost:3000/users/604e5d8458d0b87135a69402/posts' \
---header 'x-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDRlNWQ4NDU4ZDBiODcxMzVhNjk0MDIiLCJpYXQiOjE2MTU3NTA2Njh9.jcRhDO6eMwZYPahxlhRRfkpFVHU8UjT6q4LV50_-Pko'
+--header 'x-auth-token: {jsonwebtoken}'
 ```
 
 #### _Example Response 2_
@@ -416,22 +416,188 @@ Get all posts. By default this will only return published posts.
 | ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
 | x-auth-token | Optional            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
 
+#### _Returns_
+
+All published [posts](#posts). Unpublished posts may be included for admins by using the includeunpublished query string.
+
+#### _Example Request 1_
+
+```bash
+curl --location --request GET 'http://localhost:3000/posts/'
+```
+
+#### _Example Response 1_
+
+```json
+[
+  {
+    "isPublished": true,
+    "_id": "604e634248484473c282b1dd",
+    "title": "Terrifying Space Monkeys?",
+    "text": "Look, I had to rewire the grav thrust because somebody won't replace that crappy compression coil.",
+    "user": "604e5d8458d0b87135a69402",
+    "createdAt": "2021-03-14T19:25:54.716Z",
+    "updatedAt": "2021-03-14T19:25:54.716Z",
+    "__v": 0
+  },
+  {
+    "isPublished": true,
+    "_id": "604e645948484473c282b1df",
+    "title": "Buffet Table?",
+    "text": "Well how can we be sure, unless we question it?",
+    "user": "604e5d8458d0b87135a69402",
+    "createdAt": "2021-03-14T19:30:33.892Z",
+    "updatedAt": "2021-03-14T19:30:33.892Z",
+    "__v": 0
+  },
+  {
+    "isPublished": true,
+    "_id": "604e71ef9ba006741345437e",
+    "title": "I think we should call it your grave!",
+    "text": "Ah, curse your sudden but inevitable betrayal",
+    "user": "604e712f9ba006741345437c",
+    "createdAt": "2021-03-14T20:28:31.857Z",
+    "updatedAt": "2021-03-14T20:28:31.857Z",
+    "__v": 0
+  }
+]
+```
+
+#### _Example Request 2_ (using includeunpublished query string)
+
+```bash
+curl --location --request GET 'http://localhost:3000/posts?includeunpublished=true' \
+--header 'x-auth-token: {jsonwebtoken for admin user}'
+```
+
+#### _Example Response 2_
+
+```json
+[
+  {
+    "isPublished": true,
+    "_id": "604e634248484473c282b1dd",
+    "title": "Terrifying Space Monkeys?",
+    "text": "Look, I had to rewire the grav thrust because somebody won't replace that crappy compression coil.",
+    "user": "604e5d8458d0b87135a69402",
+    "createdAt": "2021-03-14T19:25:54.716Z",
+    "updatedAt": "2021-03-14T19:25:54.716Z",
+    "__v": 0
+  },
+  {
+    "isPublished": false,
+    "_id": "604e638648484473c282b1de",
+    "title": "Simon",
+    "text": "How clueless can he be!?",
+    "user": "604e5d8458d0b87135a69402",
+    "createdAt": "2021-03-14T19:27:02.729Z",
+    "updatedAt": "2021-03-14T19:27:02.729Z",
+    "__v": 0
+  },
+  {
+    "isPublished": true,
+    "_id": "604e645948484473c282b1df",
+    "title": "Buffet Table?",
+    "text": "Well how can we be sure, unless we question it?",
+    "user": "604e5d8458d0b87135a69402",
+    "createdAt": "2021-03-14T19:30:33.892Z",
+    "updatedAt": "2021-03-14T19:30:33.892Z",
+    "__v": 0
+  },
+  {
+    "isPublished": true,
+    "_id": "604e71ef9ba006741345437e",
+    "title": "I think we should call it your grave!",
+    "text": "Ah, curse your sudden but inevitable betrayal",
+    "user": "604e712f9ba006741345437c",
+    "createdAt": "2021-03-14T20:28:31.857Z",
+    "updatedAt": "2021-03-14T20:28:31.857Z",
+    "__v": 0
+  }
+]
+```
+
+#### _Example Request 3_ (using limit and skip query strings -- good for pagination)
+
+```bash
+curl --location --request GET 'http://localhost:3000/posts?limit=2&skip=1'
+```
+
+#### _Example Response 3_
+
+```json
+[
+  {
+    "isPublished": true,
+    "_id": "604e645948484473c282b1df",
+    "title": "Buffet Table?",
+    "text": "Well how can we be sure, unless we question it?",
+    "user": "604e5d8458d0b87135a69402",
+    "createdAt": "2021-03-14T19:30:33.892Z",
+    "updatedAt": "2021-03-14T19:30:33.892Z",
+    "__v": 0
+  },
+  {
+    "isPublished": true,
+    "_id": "604e71ef9ba006741345437e",
+    "title": "I think we should call it your grave!",
+    "text": "Ah, curse your sudden but inevitable betrayal",
+    "user": "604e712f9ba006741345437c",
+    "createdAt": "2021-03-14T20:28:31.857Z",
+    "updatedAt": "2021-03-14T20:28:31.857Z",
+    "__v": 0
+  }
+]
+```
+
 <h3 id="post-/posts">POST /posts</h3>
 
 Create a new post. Requires a logged-in user, which will in turn be saved as the post's user.
 
 #### _Parameters_
 
-| Request Body | Required / Optional | Description                                                                         | Type    |
-| ------------ | ------------------- | ----------------------------------------------------------------------------------- | ------- |
-| title        | Optional            | Post title. Must be between 1 and 255 characters long.                              | string  |
-| text         | Optional            | Post text. Must be between 1 and 99999 characters long.                             | string  |
-| isPublished  | Optional            | When false, post will only be visible to admins and the post's own user.            | boolean |
-| (user)       | (n/a)               | (user set to the logged-in user and needs not be otherwise included in the request) | (n/a)   |
+| Request Body | Required / Optional | Description                                                                                                                                                                           | Type    |
+| ------------ | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| title        | Optional            | Post title. Must be between 1 and 255 characters long.                                                                                                                                | string  |
+| text         | Optional            | Post text. Must be between 1 and 99999 characters long.                                                                                                                               | string  |
+| isPublished  | Optional            | When false, post will only be visible to admins and the post's own user.                                                                                                              | boolean |
+| user         | Optional            | User optional for admins. If not included, or if logged in user is not an admin, the user field will be set to the logged-in user and needs not be otherwise included in the request. | string  |
 
 | Header       | Required / Optional | Description                                                                                |
 | ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
 | x-auth-token | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
+
+#### _Returns_
+
+The newly created [post](#posts)
+
+#### _Example Request_
+
+```bash
+curl --location --request POST 'http://localhost:3000/posts' \
+--header 'x-auth-token: {jsonwebtoken}' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "title": "What'\''s that make us?",
+    "text": "Big damn heroes, sir.",
+    "isPublished": "true"
+}'
+```
+
+#### _Example Response_
+
+```json
+{
+  "isPublished": true,
+  "_id": "604e74d79ba006741345437f",
+  "title": "What's that make us?",
+  "text": "Big damn heroes, sir.",
+  "user": "604d8dc8a9c87361f984d130",
+  "createdAt": "2021-03-14T20:40:55.541Z",
+  "updatedAt": "2021-03-14T20:40:55.541Z",
+  "__v": 0
+}
+```
 
 <h3 id="get-/posts/{postid}">GET /posts/{postid}</h3>
 
@@ -446,6 +612,31 @@ Gets a single post. If the post is unpublished, it will only be accessible to ad
 | Header       | Required / Optional | Description                                                                                |
 | ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
 | x-auth-token | Optional            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
+
+#### _Returns_
+
+The [post](#posts) given in the postid path parameter
+
+#### _Example Request_
+
+```bash
+curl --location --request GET 'http://localhost:3000/posts/604e74d79ba006741345437f'
+```
+
+#### _Example Response_
+
+```json
+{
+  "isPublished": true,
+  "_id": "604e74d79ba006741345437f",
+  "title": "What's that make us?",
+  "text": "Big damn heroes, sir.",
+  "user": "604d8dc8a9c87361f984d130",
+  "createdAt": "2021-03-14T20:40:55.541Z",
+  "updatedAt": "2021-03-14T20:40:55.541Z",
+  "__v": 0
+}
+```
 
 <h3 id="put-/posts/{postid}">PUT /posts/{postid}</h3>
 
@@ -468,6 +659,36 @@ Updates a single post. Only accessible to admins and the post's user.
 | ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
 | x-auth-token | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
 
+#### _Returns_
+
+The updated [post](#posts) given in the postid path parameter
+
+#### _Example Request_
+
+```bash
+curl --location --request PUT 'http://localhost:3000/posts/604e74d79ba006741345437f' \
+--header 'x-auth-token: {jsonwebtoken}' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "text": "Big damn heroes, sir. / Ain'\''t we just."
+}'
+```
+
+#### _Example Response_
+
+```json
+{
+  "isPublished": true,
+  "_id": "604e74d79ba006741345437f",
+  "title": "What's that make us?",
+  "text": "Big damn heroes, sir. / Ain't we just.",
+  "user": "604d8dc8a9c87361f984d130",
+  "createdAt": "2021-03-14T20:40:55.541Z",
+  "updatedAt": "2021-03-14T20:46:49.537Z",
+  "__v": 0
+}
+```
+
 <h3 id="delete-/posts/{postid}">DELETE /posts/{postid}</h3>
 
 Remove a user. Logged-in users may remove their own account only. Admins may remove any account.
@@ -481,6 +702,32 @@ Remove a user. Logged-in users may remove their own account only. Admins may rem
 | Header       | Required / Optional | Description                                                                                |
 | ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
 | x-auth-token | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
+
+#### _Returns_
+
+The deleted [post](#posts)
+
+#### _Example Request_
+
+```bash
+curl --location --request DELETE 'http://localhost:3000/posts/604e634248484473c282b1dd' \
+--header 'x-auth-token: {jsonwebtoken}'
+```
+
+#### _Example Response_
+
+```json
+{
+  "isPublished": true,
+  "_id": "604e634248484473c282b1dd",
+  "title": "Terrifying Space Monkeys?",
+  "text": "Look, I had to rewire the grav thrust because somebody won't replace that crappy compression coil.",
+  "user": "604e5d8458d0b87135a69402",
+  "createdAt": "2021-03-14T19:25:54.716Z",
+  "updatedAt": "2021-03-14T19:25:54.716Z",
+  "__v": 0
+}
+```
 
 <h3 id="post-/posts/{postid}/publish">POST /posts/{postid}/publish</h3>
 
@@ -496,6 +743,32 @@ Sets the isPublished attribute for the given post to `true`. Posts may be publis
 | ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
 | x-auth-token | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
 
+#### _Returns_
+
+The newly-published [post](#posts)
+
+#### _Example Request_
+
+```bash
+curl --location --request POST 'http://localhost:3000/posts/604e638648484473c282b1de/publish' \
+--header 'x-auth-token: {jsonwebtoken}'
+```
+
+#### _Example Response_
+
+```json
+{
+  "isPublished": true,
+  "_id": "604e638648484473c282b1de",
+  "title": "Simon",
+  "text": "How clueless can he be!?",
+  "user": "604e5d8458d0b87135a69402",
+  "createdAt": "2021-03-14T19:27:02.729Z",
+  "updatedAt": "2021-03-14T20:56:23.672Z",
+  "__v": 0
+}
+```
+
 <h3 id="post-/posts/{postid}/unpublish">POST /posts/{postid}/unpublish</h3>
 
 Sets the isPublished attribute for the given post to `false`. Posts may be unpublished by their own user or admins.
@@ -509,6 +782,32 @@ Sets the isPublished attribute for the given post to `false`. Posts may be unpub
 | Header       | Required / Optional | Description                                                                                |
 | ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
 | x-auth-token | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
+
+#### _Returns_
+
+The newly-unpublished [post](#posts)
+
+#### _Example Request_
+
+```bash
+curl --location --request POST 'http://localhost:3000/posts/604e638648484473c282b1de/unpublish' \
+--header 'x-auth-token: {jsonwebtoken}'
+```
+
+#### _Example Response_
+
+```json
+{
+  "isPublished": false,
+  "_id": "604e638648484473c282b1de",
+  "title": "Simon",
+  "text": "How clueless can he be!?",
+  "user": "604e5d8458d0b87135a69402",
+  "createdAt": "2021-03-14T19:27:02.729Z",
+  "updatedAt": "2021-03-14T21:00:40.171Z",
+  "__v": 0
+}
+```
 
 <h3 id="get-/posts/{postid}/comments">GET /posts/{postid}/comments</h3>
 
@@ -524,6 +823,33 @@ Get the comments for the given post. Comments may only be retrieved for publishe
 | ------------ | ----------------------------------------------------------------------------- | ------ |
 | limit        | Response will return at most the limit number of comments                     | number |
 | skip         | Query will skip the provided number of comments (ordered by date of creation) | number |
+
+#### _Returns_
+
+All comments for the [post](#posts) indicated by `postid` in the path
+
+#### _Example Request_
+
+```bash
+curl --location --request GET 'http://localhost:3000/posts/604e638648484473c282b1de/comments'
+```
+
+#### _Example Response_
+
+```json
+[
+  {
+    "_id": "604e7a0a9ba0067413454380",
+    "text": "Who, me?",
+    "author": "Dr. Simon Tam",
+    "email": "simon@tam.com",
+    "post": "604e638648484473c282b1de",
+    "createdAt": "2021-03-14T21:03:06.044Z",
+    "updatedAt": "2021-03-14T21:03:06.044Z",
+    "__v": 0
+  }
+]
+```
 
 <h3 id="post-/posts/{postid}/comments">POST /posts/{postid}/comments</h3>
 
@@ -542,6 +868,38 @@ Create a new comment for the given post. Comments may only be created for publis
 | email        | Optional            | An email address for the comment's author.                  | boolean |
 | (post)       | (n/a)               | (post will be set to the post retrieved by the postid Path) | n/a     |
 
+#### _Returns_
+
+The newly-created [comment](#comments)
+
+#### _Example Request_
+
+```bash
+curl --location --request POST 'http://localhost:3000/posts/604e638648484473c282b1de/comments' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "text": "Who, me?",
+    "author": "Dr. Simon Tam",
+    "email": "simon@tam.com",
+    "post": "604e638648484473c282b1de"
+}'
+```
+
+#### _Example Response_
+
+```json
+{
+  "_id": "604e7a0a9ba0067413454380",
+  "text": "Who, me?",
+  "author": "Dr. Simon Tam",
+  "email": "simon@tam.com",
+  "post": "604e638648484473c282b1de",
+  "createdAt": "2021-03-14T21:03:06.044Z",
+  "updatedAt": "2021-03-14T21:03:06.044Z",
+  "__v": 0
+}
+```
+
 <h3 id="get-/posts/{postid}/comments/{commentid}">GET /posts/{postid}/comments/{commentid}</h3>
 
 Get a single comment.
@@ -552,6 +910,31 @@ Get a single comment.
 | --------- | ----------------------------------------------------------------- |
 | postid    | The post's unique id. This will be a 16-character-long string.    |
 | commentid | The comment's unique id. This will be a 16-character-long string. |
+
+#### _Returns_
+
+The comment [comment](#comments) indicated by `commentid` in the path
+
+#### _Example Request_
+
+```bash
+curl --location --request GET 'http://localhost:3000/posts/604e74d79ba006741345437f/comments/604e7aa59ba0067413454381'
+```
+
+#### _Example Response_
+
+```json
+{
+  "_id": "604e7aa59ba0067413454381",
+  "text": "Ain't we just",
+  "author": "Mal",
+  "email": "mal@gmail.com",
+  "post": "604e74d79ba006741345437f",
+  "createdAt": "2021-03-14T21:05:41.997Z",
+  "updatedAt": "2021-03-14T21:05:41.997Z",
+  "__v": 0
+}
+```
 
 <h3 id="put-/posts/{postid}/comments/{commentid}">PUT /posts/{postid}/comments/{commentid}</h3>
 
@@ -575,6 +958,36 @@ Update a single comment. Only accessible for admins.
 | ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
 | x-auth-token | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
 
+#### _Returns_
+
+The updated comment [comment](#comments) indicated by `commentid` in the path
+
+#### _Example Request_
+
+```bash
+curl --location --request PUT 'http://localhost:3000/posts/604e74d79ba006741345437f/comments/604e7aa59ba0067413454381' \
+--header 'x-auth-token: {jsonwebtoken}' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "email": "mal@colmreynolds.com"
+}'
+```
+
+#### _Example Response_
+
+```json
+{
+  "_id": "604e7aa59ba0067413454381",
+  "text": "Ain't we just",
+  "author": "Mal",
+  "email": "mal@colmreynolds.com",
+  "post": "604e74d79ba006741345437f",
+  "createdAt": "2021-03-14T21:05:41.997Z",
+  "updatedAt": "2021-03-14T21:16:37.470Z",
+  "__v": 0
+}
+```
+
 <h3 id="delete-/posts/{postid}/comments/{commentid}">DELETE /posts/{postid}/comments/{commentid}</h3>
 
 Removes a comment. Logged in users may remove comments on their own posts. Admins may remove any comment.
@@ -590,6 +1003,32 @@ Removes a comment. Logged in users may remove comments on their own posts. Admin
 | ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
 | x-auth-token | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
 
+#### _Returns_
+
+The deleted comment [comment](#comments) indicated by `commentid` in the path
+
+#### _Example Request_
+
+```bash
+curl --location --request DELETE 'http://localhost:3000/posts/604e74d79ba006741345437f/comments/604e7aa59ba0067413454381' \
+--header 'x-auth-token: {jsonwebtoken}'
+```
+
+#### _Example Response_
+
+```json
+{
+  "_id": "604e7aa59ba0067413454381",
+  "text": "Ain't we just",
+  "author": "Mal",
+  "email": "mal@colmreynolds.com",
+  "post": "604e74d79ba006741345437f",
+  "createdAt": "2021-03-14T21:05:41.997Z",
+  "updatedAt": "2021-03-14T21:16:37.470Z",
+  "__v": 0
+}
+```
+
 <h3 id="get-/me">GET /me</h3>
 
 Get the logged in user's information.
@@ -599,6 +1038,32 @@ Get the logged in user's information.
 | Header       | Required / Optional | Description                                                                                |
 | ------------ | ------------------- | ------------------------------------------------------------------------------------------ |
 | x-auth-token | Required            | A valid JSON Web Token, which may be acquired at registration, or with the /login endpoint |
+
+#### _Returns_
+
+The logged in [user](#users)
+
+#### _Example Request_
+
+```bash
+curl --location --request GET 'http://localhost:3000/me' \
+--header 'x-auth-token: {jsonwebtoken}'
+```
+
+#### _Example Response_
+
+```json
+{
+  "_id": "604d8dc8a9c87361f984d130",
+  "firstName": "Malcolm",
+  "lastName": "Reynolds",
+  "email": "captaintightpants@gmail.com",
+  "isAdmin": true,
+  "__v": 0,
+  "fullName": "Malcolm Reynolds",
+  "id": "604d8dc8a9c87361f984d130"
+}
+```
 
 <h3 id="post-/login">POST /login</h3>
 
@@ -610,3 +1075,24 @@ Log in a user. Returns a JSON Web Token to be included in the x-auth-token heade
 | ------------ | ------------------- | ---------------------------------------------------------------- | ------ |
 | email        | Required            | User's email address, provided at registration or updated since. | string |
 | password     | Required            | User's password, provided at registration or updated since.      | string |
+
+#### _Returns_
+
+The logged in [user](#users)
+
+#### _Example Request_
+
+```bash
+curl --location --request POST 'http://localhost:3000/login' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "email": "rivertam@esp.edu",
+    "password": "riverPassword"
+}'
+```
+
+#### _Example Response_
+
+"eyJhbGciOiJLUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDRlYWQwYLc0Y2YwOTdjZTlkZjgxZD4iLCJpYXQiOjE2MTU3Njg4NzN9.ZKoc-bCCqpL421PHt_3vDzPtdg-Tv0jcTFh48VPt-ZU"
+
+(Note: This is not the actual token response for the above response. Just an example of what your json web token will look like, give or take.)
