@@ -1,6 +1,8 @@
-# BLOG API
+# BLOG REST API
 
-> A blog REST api allowing multiple users, admins, posts, and comments
+> A blog REST api allowing multiple users, admins, posts, and comments.
+
+Implements modern authentication and authorization using json web tokens.
 
 [![Coverage](https://img.shields.io/badge/Coverage-100%25-green)](https://github.com/scottBowles/blog/README.md)
 [![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/scottBowles/blog)
@@ -35,9 +37,16 @@
 
 Clone this repository and change directory into the folder
 
+Using SSH
 ```bash
 git clone git@github.com:scottBowles/blog.git
-cd ./blog
+cd blog
+```
+
+Using https
+```bash
+git clone https://github.com/scottBowles/blog.git
+cd blog
 ```
 
 Install dependencies
@@ -46,14 +55,15 @@ Install dependencies
 npm i
 ```
 
-Create a .env file with environment variables. For this you will need to set up your MongoDB databases (a dev db and a test db) and retrieve the connection URIs. The URIs will look something like this: `mongodb+srv://[username]:[password]@cluster0.g79of.mongodb.net/[database]?retryWrites=true&w=majority`
+Create a filed named `.env` in the /blog directory with environment variables. For this you will need to set up your MongoDB databases (a dev db and a test db) and retrieve the connection URIs. The URIs will look something like this: `mongodb+srv://[username]:[password]@cluster0.g79of.mongodb.net/[database_name]?retryWrites=true&w=majority`
 
+The file's contents should include the following variables. Variables are defined in the format `key=value`, with no quotation marks:
 ```
 PORT=3000
 PORT_TEST=5000
 DB_URI={Dev DB Connection URI}
 DB_URI_TEST={Test DB Connection URI}
-JWT_PRIVATE_KEY=aPrivatePasswordDefinedHere
+JWT_PRIVATE_KEY=aPasskeyOfYourChoiceDefinedOnlyHere
 ```
 
 Start the server with `npm start` and access at `http://localhost:3000/`
