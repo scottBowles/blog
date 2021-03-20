@@ -1,8 +1,6 @@
 # BLOG REST API
 
-> A blog REST api allowing multiple users, admins, posts, and comments.
-
-Implements modern authentication and authorization using json web tokens.
+> A blog REST api allowing multiple users, admins, posts, and comments. Implements modern JWT-based authentication and authorization. Fully tested.
 
 [![Coverage](https://img.shields.io/badge/Coverage-100%25-green)](https://github.com/scottBowles/blog/README.md)
 [![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/scottBowles/blog)
@@ -20,6 +18,7 @@ Implements modern authentication and authorization using json web tokens.
 [![Node.js](https://img.shields.io/badge/-Node.js-339933?logo=node.js&logoColor=fff)](https://nodejs.org/)
 [![Express](https://img.shields.io/badge/-Express-000000?logo=express)](https://expressjs.com/)
 [![MongoDB](https://img.shields.io/badge/-MongoDB-153814?logo=mongodb)](https://www.mongodb.org/)
+[![Mongoose](https://img.shields.io/static/v1?label=m&message=Mongoose&color=880000&labelColor=eee)](https://mongoosejs.com/)
 [![Jest](https://img.shields.io/badge/-Jest-C21325?logo=jest)](https://jestjs.io/)
 [![Babel](https://img.shields.io/badge/-Babel-030301?logo=babel)](https://babeljs.io/)
 [![ESLint](https://img.shields.io/badge/-ESLint-4B32C3?logo=eslint)](https://eslint.org/)
@@ -35,39 +34,49 @@ Implements modern authentication and authorization using json web tokens.
 - [MongoDB](https://www.mongodb.com/cloud/atlas)
 - [Git](https://git-scm.com/)
 
-Clone this repository and change directory into the folder
+### Instructions
 
-Using SSH
-```bash
-git clone git@github.com:scottBowles/blog.git
-cd blog
-```
+1. Clone this repository and change directory into the folder
 
-Using https
-```bash
-git clone https://github.com/scottBowles/blog.git
-cd blog
-```
+   - Using SSH
 
-Install dependencies
+     ```bash
+     git clone git@github.com:scottBowles/blog.git
+     cd blog
+     ```
 
-```bash
-npm i
-```
+   - Using https
 
-Create a filed named `.env` in the /blog directory with environment variables. For this you will need to set up your MongoDB databases (a dev db and a test db) and retrieve the connection URIs. The URIs will look something like this: `mongodb+srv://[username]:[password]@cluster0.g79of.mongodb.net/[database_name]?retryWrites=true&w=majority`
+     ```bash
+     git clone https://github.com/scottBowles/blog.git
+     cd blog
+     ```
 
-The file's contents should include the following variables. Variables are defined in the format `key=value`, with no quotation marks:
-```
-PORT=3000
-PORT_TEST=5000
-DB_URI={Dev DB Connection URI}
-DB_URI_TEST={Test DB Connection URI}
-JWT_PRIVATE_KEY=aPasskeyOfYourChoiceDefinedOnlyHere
-```
+1. Install dependencies
 
-Start the server with `npm start` and access at `http://localhost:3000/`
-Run tests with `npm test`
+   ```bash
+   npm i
+   ```
+
+1. Configure environment variables
+
+   Create a filed named `.env` in the /blog directory with environment variables. For this you will need to set up your MongoDB databases (a dev db and a test db) and retrieve the connection URIs. The URIs will look something like this: `mongodb+srv://[username]:[password]@cluster0.g79of.mongodb.net/[database_name]?retryWrites=true&w=majority`
+
+   The file's contents should include the following variables. Variables are defined in the format `key=value`, with no quotation marks:
+
+   ```
+   PORT=3000
+   PORT_TEST=5000
+   DB_URI={Dev DB Connection URI}
+   DB_URI_TEST={Test DB Connection URI}
+   JWT_PRIVATE_KEY=aPasskeyOfYourChoiceDefinedOnlyHere
+   ```
+
+1. Success!
+
+   Start the server with `npm start` and access the api at `http://localhost:3000/`
+
+   Run tests with `npm test`
 
 <h2 id="resources">API Resources</h2>
 
