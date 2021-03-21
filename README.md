@@ -30,7 +30,7 @@
 
 ### Requirements
 
-- [Node.js](https://nodejs.org/en/) with npm
+- [Node.js with npm](https://nodejs.org/en/)
 - [MongoDB](https://www.mongodb.com/cloud/atlas)
 - [Git](https://git-scm.com/)
 
