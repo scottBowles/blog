@@ -2,8 +2,8 @@
 
 > A blog REST api allowing multiple users, admins, posts, and comments. Implements modern JWT-based authentication and authorization. Fully tested.
 
-[![Coverage](https://img.shields.io/badge/Coverage-100%25-green)](https://github.com/scottBowles/blog/README.md)
-[![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/scottBowles/blog)
+[![Coverage](https://img.shields.io/badge/Coverage-100%25-green)](https://github.com/scottBowles/blog-api/README.md)
+[![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/scottBowles/blog-api)
 
 ## Table of Contents
 
@@ -41,14 +41,14 @@
    - Using SSH
 
      ```bash
-     git clone git@github.com:scottBowles/blog.git
+     git clone git@github.com:scottBowles/blog-api.git
      cd blog
      ```
 
    - Using https
 
      ```bash
-     git clone https://github.com/scottBowles/blog.git
+     git clone https://github.com/scottBowles/blog-api.git
      cd blog
      ```
 
