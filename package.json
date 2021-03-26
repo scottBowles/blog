@@ -2,6 +2,9 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
+  "engines": {
+    "node": "15.4.0" 
+  },
   "main": "app.js",
   "type": "module",
   "scripts": {
